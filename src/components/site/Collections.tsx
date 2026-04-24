@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import necklaces from "@/assets/collection-necklaces.jpg";
 import rings from "@/assets/collection-rings.jpg";
 import earrings from "@/assets/collection-earrings.jpg";
@@ -6,11 +7,11 @@ import bangles from "@/assets/collection-bangles.jpg";
 import chains from "@/assets/collection-chains.jpg";
 
 const items = [
-  { name: "Necklaces", desc: "Statement pieces & bridal sets", img: necklaces, span: "lg:col-span-2 lg:row-span-2" },
+  { name: "Necklace", desc: "Statement pieces & bridal sets", img: necklaces, span: "lg:col-span-2 lg:row-span-2" },
   { name: "Rings", desc: "Solitaires, bands & cocktail", img: rings, span: "" },
   { name: "Earrings", desc: "Studs, jhumkas & danglers", img: earrings, span: "" },
   { name: "Bangles", desc: "Traditional & contemporary", img: bangles, span: "" },
-  { name: "Chains", desc: "Daily wear & ceremonial", img: chains, span: "" },
+  { name: "Chain", desc: "Daily wear & ceremonial", img: chains, span: "" },
 ];
 
 export const Collections = () => (
@@ -25,34 +26,32 @@ export const Collections = () => (
         className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14"
       >
         <div>
-          <div className="text-xs tracking-[0.3em] uppercase text-gold-deep mb-4">
-            Featured Collections
-          </div>
+          <div className="text-xs tracking-[0.3em] uppercase text-gold-deep mb-4">Featured Collections</div>
           <h2 className="font-serif text-4xl md:text-5xl text-foreground max-w-xl">
             Crafted with <span className="italic text-gold-gradient">passion</span>,<br />
             curated for connoisseurs.
           </h2>
         </div>
-        <a
-          href="#contact"
+        <Link
+          to="/collection"
           className="self-start md:self-end inline-flex items-center text-sm tracking-wider text-primary hover:text-gold-deep transition-colors group"
         >
           View Full Catalogue
           <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-        </a>
+        </Link>
       </motion.div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 lg:auto-rows-[18rem] gap-5">
         {items.map((it, i) => (
-          <motion.a
+          <motion.div
             key={it.name}
-            href="#contact"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.7, delay: i * 0.08 }}
             className={`group relative rounded-2xl overflow-hidden shadow-card hover:shadow-elegant transition-all duration-700 ${it.span} ${i === 0 ? "min-h-[24rem]" : "min-h-[18rem]"}`}
           >
+            <Link to={`/shop?category=${encodeURIComponent(it.name)}`} className="absolute inset-0 z-10" aria-label={it.name} />
             <img
               src={it.img}
               alt={`${it.name} - luxury wholesale gold jewellery`}
@@ -62,17 +61,13 @@ export const Collections = () => (
             <div className="absolute inset-0 bg-gradient-to-t from-primary/85 via-primary/20 to-transparent opacity-90 group-hover:opacity-95 transition-opacity duration-500" />
             <div className="absolute inset-0 ring-1 ring-inset ring-gold/0 group-hover:ring-gold/40 transition-all duration-500" />
             <div className="relative h-full flex flex-col justify-end p-7">
-              <div className="text-xs tracking-[0.25em] uppercase text-gold-soft/90 mb-1.5">
-                {it.desc}
-              </div>
-              <h3 className="font-serif text-3xl md:text-4xl text-primary-foreground">
-                {it.name}
-              </h3>
+              <div className="text-xs tracking-[0.25em] uppercase text-gold-soft/90 mb-1.5">{it.desc}</div>
+              <h3 className="font-serif text-3xl md:text-4xl text-primary-foreground">{it.name}</h3>
               <div className="mt-4 flex items-center gap-2 text-sm text-primary-foreground/80 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                Enquire Now <span>→</span>
+                Explore Collection <span>→</span>
               </div>
             </div>
-          </motion.a>
+          </motion.div>
         ))}
       </div>
     </div>
