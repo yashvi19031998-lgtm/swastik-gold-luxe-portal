@@ -31,11 +31,13 @@ const CollectionPage = () => {
           </motion.div>
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1 }} className="relative">
             <div className="absolute -inset-4 bg-gradient-gold opacity-20 blur-3xl rounded-full" />
-            <img src={featured.img} alt={featured.name} loading="eager" className="relative rounded-3xl shadow-elegant w-full aspect-[4/3] object-cover" />
-            <div className="absolute bottom-6 left-6 right-6 glass rounded-2xl p-5">
-              <div className="text-[10px] tracking-[0.3em] uppercase text-gold-deep">Featured</div>
-              <h3 className="font-serif text-2xl text-foreground mt-1">{featured.name}</h3>
-            </div>
+            <Link to={`/collection/${featured.slug}`} className="block group">
+              <img src={featured.img} alt={featured.name} loading="eager" className="relative rounded-3xl shadow-elegant w-full aspect-[4/3] object-cover transition-transform duration-700 group-hover:scale-[1.02]" />
+              <div className="absolute bottom-6 left-6 right-6 glass rounded-2xl p-5">
+                <div className="text-[10px] tracking-[0.3em] uppercase text-gold-deep">Featured</div>
+                <h3 className="font-serif text-2xl text-foreground mt-1">{featured.name}</h3>
+              </div>
+            </Link>
           </motion.div>
         </div>
       </section>
