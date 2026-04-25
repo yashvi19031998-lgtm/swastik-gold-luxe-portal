@@ -119,19 +119,36 @@ export const relatedProducts = (p: Product, n = 4) =>
   PRODUCTS.filter((x) => x.category === p.category && x.id !== p.id).slice(0, n);
 
 export const COLLECTIONS = [
-  { slug: "daily-wear", name: "Daily Wear Jewellery", desc: "Lightweight pieces for everyday elegance", img: daily },
-  { slug: "office-wear", name: "Office Wear Jewellery", desc: "Subtle sophistication for the workplace", img: chains },
-  { slug: "wedding", name: "Wedding Collection", desc: "Heirloom bridal sets crafted to last generations", img: wedding, featured: true },
-  { slug: "engagement", name: "Engagement Ring Collection", desc: "Solitaires & halo rings for the moment", img: engagement },
-  { slug: "party-wear", name: "Party Wear", desc: "Statement jewellery for grand occasions", img: necklaces },
-  { slug: "festive", name: "Festive Collection", desc: "Auspicious designs for every celebration", img: earrings },
-  { slug: "diamond", name: "Diamond Jewellery", desc: "Brilliant cuts in 18Kt gold", img: rings },
-  { slug: "polki", name: "Real Polki Jewellery", desc: "Traditional uncut diamond artistry", img: mangalsutra },
-  { slug: "anniversary", name: "Anniversary Gift", desc: "Timeless tokens of love", img: bracelet },
-  { slug: "god-idol", name: "God Idol", desc: "Sacred gold idols & coins", img: nosepin },
-  { slug: "valentine", name: "Valentine Collection", desc: "Romantic designs in rose gold", img: pendant },
-  { slug: "italian", name: "Italian Collection", desc: "Sleek European-inspired chains", img: chains },
-  { slug: "antique", name: "Antique Collection", desc: "Vintage finishes & heritage motifs", img: bangles },
-  { slug: "kids", name: "Kids Collection", desc: "Petite pieces for little ones", img: bracelet },
-  { slug: "mothers-day", name: "Mother's Day Collection", desc: "Heartfelt gifts to celebrate her", img: pendant },
+  { slug: "daily-wear", name: "Daily Wear Jewellery", desc: "Lightweight pieces for everyday elegance", img: daily, tagline: "Effortless luxury for every day", categories: ["Chain", "Pendants", "Earrings", "Rings", "Bracelet"], maxWeight: 12 },
+  { slug: "office-wear", name: "Office Wear Jewellery", desc: "Subtle sophistication for the workplace", img: chains, tagline: "Refined statements for the boardroom", categories: ["Chain", "Earrings", "Pendants", "Bracelet"], maxWeight: 10 },
+  { slug: "wedding", name: "Wedding Collection", desc: "Heirloom bridal sets crafted to last generations", img: wedding, featured: true, tagline: "The bride's first heirloom", categories: ["Necklace", "Bangles", "Earrings", "Mangalsutra", "Kada"] },
+  { slug: "engagement", name: "Engagement Ring Collection", desc: "Solitaires & halo rings for the moment", img: engagement, tagline: "A promise carved in gold", categories: ["Rings"] },
+  { slug: "party-wear", name: "Party Wear", desc: "Statement jewellery for grand occasions", img: necklaces, tagline: "Make the night unforgettable", categories: ["Necklace", "Earrings", "Pendant Set"] },
+  { slug: "festive", name: "Festive Collection", desc: "Auspicious designs for every celebration", img: earrings, tagline: "Celebrate tradition in gold", categories: ["Earrings", "Necklace", "Bangles", "Mangalsutra"] },
+  { slug: "diamond", name: "Diamond Jewellery", desc: "Brilliant cuts in 18Kt gold", img: rings, tagline: "Brilliance, refined", categories: ["Rings", "Earrings", "Pendants", "Necklace"], stones: "Diamond accents" },
+  { slug: "polki", name: "Real Polki Jewellery", desc: "Traditional uncut diamond artistry", img: mangalsutra, tagline: "Heritage in every stone", categories: ["Necklace", "Earrings", "Mangalsutra"], stones: "Uncut polki" },
+  { slug: "anniversary", name: "Anniversary Gift", desc: "Timeless tokens of love", img: bracelet, tagline: "Mark the milestones in gold", categories: ["Bracelet", "Pendants", "Rings"] },
+  { slug: "god-idol", name: "God Idol", desc: "Sacred gold idols & coins", img: nosepin, tagline: "Blessings cast in pure gold", categories: ["Coins"] },
+  { slug: "valentine", name: "Valentine Collection", desc: "Romantic designs in rose gold", img: pendant, tagline: "Love, beautifully expressed", categories: ["Pendants", "Rings", "Bracelet"] },
+  { slug: "italian", name: "Italian Collection", desc: "Sleek European-inspired chains", img: chains, tagline: "Continental sophistication", categories: ["Chain", "Bracelet"] },
+  { slug: "antique", name: "Antique Collection", desc: "Vintage finishes & heritage motifs", img: bangles, tagline: "Old-world charm reborn", categories: ["Bangles", "Necklace", "Kada"] },
+  { slug: "kids", name: "Kids Collection", desc: "Petite pieces for little ones", img: bracelet, tagline: "Tiny treasures, lasting memories", categories: ["Kids Jewellery", "Bracelet"] },
+  { slug: "mothers-day", name: "Mother's Day Collection", desc: "Heartfelt gifts to celebrate her", img: pendant, tagline: "For the woman who gave you everything", categories: ["Pendants", "Bracelet", "Earrings"] },
 ];
+
+export type Collection = (typeof COLLECTIONS)[number];
+
+export const getCollection = (slug: string) => COLLECTIONS.find((c) => c.slug === slug);
+
+export const productsForCollection = (c: Collection): Product[] => {
+  return PRODUCTS.filter((p) => {
+    const cats = (c as any).categories as string[] | undefined;
+    const stones = (c as any).stones as string | undefined;
+    const maxWeight = (c as any).maxWeight as number | undefined;
+    if (cats && !cats.includes(p.category)) return false;
+    if (stones && p.stones !== stones) return false;
+    if (maxWeight && p.weight > maxWeight) return false;
+    return true;
+  });
+};
+
