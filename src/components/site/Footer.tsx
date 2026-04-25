@@ -1,6 +1,6 @@
 import { Instagram, Facebook, Mail, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
-import logo from "@/assets/swastik-gold-logo.png";
+import logo from "@/assets/swastik-gold-logo-new.png";
 
 const cols = [
   { title: "Explore", links: [
@@ -33,7 +33,11 @@ export const Footer = () => (
       <div className="grid lg:grid-cols-5 gap-10">
         <div className="lg:col-span-2">
           <Link to="/" className="inline-block mb-5">
-            <img src={logo} alt="Swastik Gold logo" className="h-20 w-auto drop-shadow-[0_4px_16px_hsl(38_55%_50%/0.4)]" />
+            <img 
+              src={logo} 
+              alt="Swastik Gold logo" 
+              className="h-40 md:h-56 w-auto drop-shadow-[0_4px_16px_hsl(38_55%_50%/0.4)] brightness-[1.02] contrast-[1.1]" 
+            />
           </Link>
           <p className="text-primary-foreground/75 leading-relaxed max-w-sm">
             India's trusted wholesale partner for hallmarked gold jewellery. Crafting timeless pieces for the country's finest retail boutiques since 1998.

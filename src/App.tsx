@@ -8,6 +8,8 @@ import Shop from "./pages/Shop.tsx";
 import CollectionPage from "./pages/CollectionPage.tsx";
 import CollectionDetail from "./pages/CollectionDetail.tsx";
 import ProductDetail from "./pages/ProductDetail.tsx";
+import CustomDesign from "./pages/CustomDesign.tsx";
+import Showroom from "./pages/Showroom.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -21,6 +23,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/custom-design" element={<CustomDesign />} />
+          <Route path="/showroom" element={<Showroom />} />
           <Route path="/collection" element={<CollectionPage />} />
           <Route path="/collection/:slug" element={<CollectionDetail />} />
           <Route path="/product/:id" element={<ProductDetail />} />

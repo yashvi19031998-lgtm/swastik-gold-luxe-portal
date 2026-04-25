@@ -19,13 +19,33 @@ const customizeSchema = baseSchema.extend({
 
 const STEPS = [
   { icon: PencilRuler, title: "Step 1", text: "Share your design or choose from ours" },
-  { icon: ClipboardCheck, title: "Step 2", text: "We assess your requirement & send an estimate" },
-  { icon: IndianRupee, title: "Step 3", text: "Confirm your order with secure payment" },
-  { icon: Hammer, title: "Step 4", text: "Our master craftsmen begin handcrafting" },
-  { icon: Truck, title: "Step 5", text: "Insured doorstep delivery, beautifully packed" },
+  { icon: ClipboardCheck, title: "Step 2", text: "After assessing your requirement, we will send you an estimate" },
+  { icon: IndianRupee, title: "Step 3", text: "Confirm your order by making secure payment" },
+  { icon: Hammer, title: "Step 4", text: "We will start crafting your custom jewellery" },
+  { icon: Truck, title: "Step 5", text: "Your jewellery will be shipped for home delivery" },
 ];
 
 type Mode = "upload" | "customize";
+
+const StepCard = ({ s, i }: { s: typeof STEPS[0]; i: number }) => {
+  const Icon = s.icon;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.6, delay: i * 0.1 }}
+      className="group relative bg-card rounded-2xl p-6 text-center shadow-card hover:shadow-elegant border border-border hover:border-gold/40 transition-all duration-500 hover:-translate-y-1"
+    >
+      <div className="absolute -top-3 right-4 text-[10px] tracking-[0.3em] uppercase text-gold-deep">0{i + 1}</div>
+      <div className="mx-auto w-16 h-16 rounded-full bg-gradient-gold/10 border border-gold/30 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+        <Icon className="w-7 h-7 text-gold-deep" strokeWidth={1.5} />
+      </div>
+      <h3 className="font-serif text-xl text-foreground">{s.title}:</h3>
+      <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{s.text}</p>
+    </motion.div>
+  );
+};
 
 export const CreateYourOwn = () => {
   const [mode, setMode] = useState<Mode>("upload");
@@ -111,27 +131,17 @@ export const CreateYourOwn = () => {
         </motion.div>
 
         {/* 5 step process */}
-        <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-          {STEPS.map((s, i) => {
-            const Icon = s.icon;
-            return (
-              <motion.div
-                key={s.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-                className="group relative bg-card rounded-2xl p-6 text-center shadow-card hover:shadow-elegant border border-border hover:border-gold/40 transition-all duration-500 hover:-translate-y-1"
-              >
-                <div className="absolute -top-3 right-4 text-[10px] tracking-[0.3em] uppercase text-gold-deep">0{i + 1}</div>
-                <div className="mx-auto w-16 h-16 rounded-full bg-gradient-gold/10 border border-gold/30 flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
-                  <Icon className="w-7 h-7 text-gold-deep" strokeWidth={1.5} />
-                </div>
-                <h3 className="font-serif text-xl text-foreground">{s.title}</h3>
-                <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{s.text}</p>
-              </motion.div>
-            );
-          })}
+        <div className="mt-16 space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {STEPS.slice(0, 3).map((s, i) => (
+              <StepCard key={s.title} s={s} i={i} />
+            ))}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {STEPS.slice(3).map((s, i) => (
+              <StepCard key={s.title} s={s} i={i + 3} />
+            ))}
+          </div>
         </div>
 
         {/* Form section */}
@@ -205,13 +215,21 @@ export const CreateYourOwn = () => {
                   {mode === "customize" && (
                     <div className="sm:col-span-2">
                       <label className="text-xs tracking-wider uppercase text-foreground/70 mb-2 block">Product Code *</label>
-                      <input
-                        className={input}
-                        placeholder="e.g. SG-1042 (find from our catalogue)"
-                        value={form.productCode}
-                        onChange={update("productCode")}
-                        maxLength={40}
-                      />
+                      <div className="flex gap-2">
+                        <input
+                          className={input}
+                          placeholder="e.g. SG-1042 (find from our catalogue)"
+                          value={form.productCode}
+                          onChange={update("productCode")}
+                          maxLength={40}
+                        />
+                        <button 
+                          type="button" 
+                          className="px-6 rounded-xl bg-secondary border border-border text-foreground hover:bg-gold/10 transition-colors shrink-0"
+                        >
+                          Find Image
+                        </button>
+                      </div>
                     </div>
                   )}
 
@@ -226,6 +244,19 @@ export const CreateYourOwn = () => {
                       onChange={update("details")}
                       maxLength={800}
                     />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <div className="p-4 bg-secondary/50 border border-border rounded-xl flex items-center justify-between group cursor-pointer hover:border-gold/30 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 border-2 border-border group-hover:border-gold/50 rounded bg-background transition-colors" />
+                        <span className="text-sm font-medium">I'm not a robot</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="reCAPTCHA" className="w-8 h-8 opacity-70" />
+                        <span className="text-[10px] text-muted-foreground">reCAPTCHA</span>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="sm:col-span-2 flex items-start gap-3">
