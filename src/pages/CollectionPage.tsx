@@ -64,7 +64,7 @@ const CollectionPage = () => {
                 <div className="relative h-full flex flex-col justify-end p-6">
                   <h3 className="font-serif text-2xl md:text-3xl text-primary-foreground">{c.name}</h3>
                   <p className="text-sm text-primary-foreground/80 mt-1.5 max-w-xs">{c.desc}</p>
-                  <Link to="/shop" className="mt-4 inline-flex items-center w-fit px-5 py-2 rounded-full bg-background/95 text-foreground text-xs tracking-wider hover:bg-gradient-gold hover:text-gold-foreground transition-all">
+                  <Link to={`/collection/${c.slug}`} className="mt-4 inline-flex items-center w-fit px-5 py-2 rounded-full bg-background/95 text-foreground text-xs tracking-wider hover:bg-gradient-gold hover:text-gold-foreground transition-all">
                     Explore Collection →
                   </Link>
                 </div>
