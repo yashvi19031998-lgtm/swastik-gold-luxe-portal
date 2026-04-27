@@ -46,7 +46,7 @@ const ProductDetail = () => {
     );
   }
 
-  const gallery = [product.image, product.image, product.image, product.image];
+  
 
   const share = async () => {
     try {
@@ -71,37 +71,62 @@ const ProductDetail = () => {
           </nav>
 
           <div className="grid lg:grid-cols-2 gap-12">
-            {/* Gallery */}
-            <div className="grid grid-cols-[80px_1fr] gap-4">
-              <div className="flex flex-col gap-3">
-                {gallery.map((g, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActive(i)}
-                    className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all ${active === i ? "border-primary shadow-soft" : "border-transparent opacity-70 hover:opacity-100"}`}
-                  >
-                    <img src={g} alt={`${product.name} view ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
-                  </button>
-                ))}
-              </div>
-              <div className="relative aspect-square rounded-2xl overflow-hidden bg-secondary/40 shadow-card group">
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={active}
-                    src={gallery[active]}
-                    alt={product.name}
-                    initial={{ opacity: 0, scale: 1.02 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                </AnimatePresence>
-                <div className="absolute top-4 left-4 px-3 py-1 bg-gradient-gold text-gold-foreground text-[10px] tracking-widest uppercase rounded-full shadow-soft">
-                  Hallmark Certified
+            {/* Gallery — 5 stylized views derived from the product image */}
+            {(() => {
+              const views = [
+                { label: "Front", style: { transform: "scale(1)" } as const, filter: "none" },
+                { label: "Detail", style: { transform: "scale(1.6) translate(-8%, -6%)" } as const, filter: "saturate(1.1) contrast(1.05)" },
+                { label: "Angle", style: { transform: "scale(1.15) rotate(-4deg)" } as const, filter: "brightness(1.05)" },
+                { label: "Macro", style: { transform: "scale(1.9) translate(10%, 8%)" } as const, filter: "saturate(1.15) contrast(1.08)" },
+                { label: "Mood", style: { transform: "scale(1.1)" } as const, filter: "brightness(0.85) saturate(1.2) hue-rotate(-6deg)" },
+              ];
+              return (
+                <div className="grid grid-cols-[80px_1fr] gap-4">
+                  <div className="flex flex-col gap-3">
+                    {views.map((v, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setActive(i)}
+                        aria-label={`${v.label} view`}
+                        className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all ${active === i ? "border-primary shadow-soft" : "border-border/40 opacity-70 hover:opacity-100"}`}
+                      >
+                        <img
+                          src={product.image}
+                          alt={`${product.name} ${v.label}`}
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                          style={{ ...v.style, filter: v.filter }}
+                        />
+                        <span className="absolute bottom-0 inset-x-0 text-[8px] tracking-widest uppercase text-center py-0.5 bg-background/80 backdrop-blur-sm text-foreground/70">
+                          {v.label}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="relative aspect-square rounded-2xl overflow-hidden bg-secondary/40 shadow-card group">
+                    <AnimatePresence mode="wait">
+                      <motion.img
+                        key={active}
+                        src={product.image}
+                        alt={`${product.name} — ${views[active].label} view`}
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        style={{ ...views[active].style, filter: views[active].filter, transition: "transform 1s ease, filter 0.6s ease" }}
+                      />
+                    </AnimatePresence>
+                    <div className="absolute top-4 left-4 px-3 py-1 bg-gradient-gold text-gold-foreground text-[10px] tracking-widest uppercase rounded-full shadow-soft">
+                      Hallmark Certified
+                    </div>
+                    <div className="absolute bottom-4 right-4 px-3 py-1 bg-background/85 backdrop-blur text-[10px] tracking-widest uppercase rounded-full text-foreground/80">
+                      {views[active].label} View
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              );
+            })()}
 
             {/* Details */}
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7 }}>
