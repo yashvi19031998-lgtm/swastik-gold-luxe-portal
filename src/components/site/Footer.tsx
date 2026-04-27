@@ -1,29 +1,36 @@
+"use client";
 import { Instagram, Facebook, Mail, Phone } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import logo from "@/assets/swastik-gold-logo-new.png";
 
 const cols = [
-  { title: "Explore", links: [
-    { label: "Home", to: "/" },
-    { label: "Shop", to: "/shop" },
-    { label: "Collection", to: "/collection" },
-    { label: "Create Your Own", to: "/#custom" },
-    { label: "Contact Us", to: "/#contact" },
-  ]},
-  { title: "Collections", links: [
-    { label: "Wedding", to: "/collection/wedding" },
-    { label: "Engagement", to: "/collection/engagement" },
-    { label: "Daily Wear", to: "/collection/daily-wear" },
-    { label: "Diamond", to: "/collection/diamond" },
-    { label: "Antique", to: "/collection/antique" },
-  ]},
-  { title: "Trade", links: [
-    { label: "Wholesale Inquiry", to: "/#contact" },
-    { label: "Bulk Orders", to: "/#contact" },
-    { label: "Custom Designs", to: "/#custom" },
-    { label: "Catalogue", to: "/shop" },
-    { label: "Hallmark Info", to: "/#contact" },
-  ]},
+  {
+    title: "Explore", links: [
+      { label: "Home", to: "/" },
+      { label: "Shop", to: "/shop" },
+      { label: "Collection", to: "/collection" },
+      { label: "Create Your Own", to: "/#custom" },
+      { label: "Contact Us", to: "/#contact" },
+    ]
+  },
+  {
+    title: "Collections", links: [
+      { label: "Wedding", to: "/collection/wedding" },
+      { label: "Engagement", to: "/collection/engagement" },
+      { label: "Daily Wear", to: "/collection/daily-wear" },
+      { label: "Diamond", to: "/collection/diamond" },
+      { label: "Antique", to: "/collection/antique" },
+    ]
+  },
+  {
+    title: "Trade", links: [
+      { label: "Wholesale Inquiry", to: "/#contact" },
+      { label: "Bulk Orders", to: "/#contact" },
+      { label: "Custom Designs", to: "/#custom" },
+      { label: "Catalogue", to: "/shop" },
+      { label: "Hallmark Info", to: "/#contact" },
+    ]
+  },
 ];
 
 export const Footer = () => (
@@ -32,11 +39,11 @@ export const Footer = () => (
     <div className="container-luxe py-16 relative">
       <div className="grid lg:grid-cols-5 gap-10">
         <div className="lg:col-span-2">
-          <Link to="/" className="inline-block mb-5">
-            <img 
-              src={logo} 
-              alt="Swastik Gold logo" 
-              className="h-40 md:h-56 w-auto drop-shadow-[0_4px_16px_hsl(38_55%_50%/0.4)] brightness-[1.02] contrast-[1.1]" 
+          <Link href="/" className="inline-block mb-5">
+            <img
+              src={typeof logo === "string" ? logo : (logo as any).src}
+              alt="Swastik Gold logo"
+              className="h-40 md:h-56 w-auto drop-shadow-[0_4px_16px_hsl(38_55%_50%/0.4)] brightness-[1.02] contrast-[1.1]"
             />
           </Link>
           <p className="text-primary-foreground/75 leading-relaxed max-w-sm">
@@ -61,7 +68,7 @@ export const Footer = () => (
             <ul className="space-y-3">
               {c.links.map((l) => (
                 <li key={l.label}>
-                  <Link to={l.to} className="text-primary-foreground/75 hover:text-gold transition-colors text-sm">
+                  <Link href={l.to} className="text-primary-foreground/75 hover:text-gold transition-colors text-sm">
                     {l.label}
                   </Link>
                 </li>
@@ -83,3 +90,4 @@ export const Footer = () => (
     </div>
   </footer>
 );
+

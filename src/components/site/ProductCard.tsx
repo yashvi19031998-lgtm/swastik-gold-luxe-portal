@@ -1,6 +1,7 @@
+"use client";
 import { motion } from "framer-motion";
 import { Heart, Eye } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import type { Product } from "@/data/products";
 import { useState } from "react";
 
@@ -14,9 +15,9 @@ export const ProductCard = ({ product, onQuickView }: { product: Product; onQuic
       transition={{ duration: 0.6 }}
       className="group relative bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-elegant transition-all duration-700 hover:-translate-y-1"
     >
-      <Link to={`/product/${product.id}`} className="block relative aspect-square overflow-hidden bg-secondary/40">
+      <Link href={`/product/${product.id}`} className="block relative aspect-square overflow-hidden bg-secondary/40">
         <img
-          src={product.image}
+          src={typeof product.image === "string" ? product.image : (product.image as any).src}
           alt={`${product.name} — ${product.purity} wholesale gold jewellery`}
           loading="lazy"
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
@@ -49,7 +50,7 @@ export const ProductCard = ({ product, onQuickView }: { product: Product; onQuic
           </button>
         )}
       </Link>
-      <Link to={`/product/${product.id}`} className="block p-4">
+      <Link href={`/product/${product.id}`} className="block p-4">
         <div className="text-[10px] tracking-[0.25em] uppercase text-gold-deep mb-1.5">
           {product.category} · {product.purity}
         </div>
@@ -64,3 +65,4 @@ export const ProductCard = ({ product, onQuickView }: { product: Product; onQuic
     </motion.div>
   );
 };
+

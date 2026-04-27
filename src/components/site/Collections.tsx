@@ -1,5 +1,6 @@
+"use client";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import necklaces from "@/assets/collection-necklaces.jpg";
 import rings from "@/assets/collection-rings.jpg";
 import earrings from "@/assets/collection-earrings.jpg";
@@ -33,7 +34,7 @@ export const Collections = () => (
           </h2>
         </div>
         <Link
-          to="/collection"
+          href="/collection"
           className="self-start md:self-end inline-flex items-center text-sm tracking-wider text-primary hover:text-gold-deep transition-colors group"
         >
           View Full Catalogue
@@ -51,9 +52,9 @@ export const Collections = () => (
             transition={{ duration: 0.7, delay: i * 0.08 }}
             className={`group relative rounded-2xl overflow-hidden shadow-card hover:shadow-elegant transition-all duration-700 ${it.span} ${i === 0 ? "min-h-[24rem]" : "min-h-[18rem]"}`}
           >
-            <Link to={`/shop?category=${encodeURIComponent(it.name)}`} className="absolute inset-0 z-10" aria-label={it.name} />
+            <Link href={`/shop?category=${encodeURIComponent(it.name)}`} className="absolute inset-0 z-10" aria-label={it.name} />
             <img
-              src={it.img}
+              src={typeof it.img === "string" ? it.img : (it.img as any).src}
               alt={`${it.name} - luxury wholesale gold jewellery`}
               loading="lazy"
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
@@ -73,3 +74,4 @@ export const Collections = () => (
     </div>
   </section>
 );
+

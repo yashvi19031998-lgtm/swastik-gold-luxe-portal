@@ -83,7 +83,7 @@ export const Hero = () => {
           <div className="absolute -inset-6 rounded-[2rem] bg-gradient-gold opacity-30 blur-2xl" />
           <div className="relative rounded-[1.75rem] overflow-hidden shadow-elegant border border-gold/30 animate-float">
             <img
-              src={heroImage}
+              src={typeof heroImage === "string" ? heroImage : (heroImage as any).src}
               alt="Luxury gold necklace with diamond accents on sea green silk"
               width={1536}
               height={1024}

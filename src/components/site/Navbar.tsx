@@ -1,7 +1,9 @@
+"use client";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown, Diamond, Star, Heart, Users, Receipt, Briefcase } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import logo from "@/assets/swastik-gold-logo-new.png";
 
 const links = [
@@ -96,7 +98,7 @@ export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [showMega, setShowMega] = useState(false);
-  const { pathname } = useLocation();
+  const pathname = usePathname();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -116,33 +118,30 @@ export const Navbar = () => {
       initial={{ y: -40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 bg-brand-dark shadow-soft ${
-        scrolled || pathname !== "/" ? "py-2" : "py-3"
-      }`}
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 bg-brand-dark shadow-soft ${scrolled || pathname !== "/" ? "py-2" : "py-3"
+        }`}
       onMouseLeave={() => setShowMega(false)}
     >
       <nav className="container-luxe flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-3 group">
-          <img 
-            src={logo} 
-            alt="Swastik Gold logo" 
-            className={`transition-all duration-500 w-auto group-hover:scale-110 brightness-[1.02] contrast-[1.1] object-contain ${
-              scrolled ? "h-14 md:h-16 -my-2" : "h-20 md:h-24 -my-4"
-            }`} 
+        <Link href="/" className="flex items-center gap-3 group">
+          <img
+            src={typeof logo === "string" ? logo : (logo as any).src}
+            alt="Swastik Gold logo"
+            className={`transition-all duration-500 w-auto group-hover:scale-110 brightness-[1.02] contrast-[1.1] object-contain ${scrolled ? "h-14 md:h-16 -my-2" : "h-20 md:h-24 -my-4"
+              }`}
           />
         </Link>
 
         <ul className="hidden xl:flex items-center gap-7">
           {links.map((l) => (
-            <li 
+            <li
               key={l.label}
               onMouseEnter={() => l.hasMega ? setShowMega(true) : setShowMega(false)}
             >
               <Link
-                to={l.to}
-                className={`relative text-[13px] font-medium tracking-wider transition-colors duration-300 flex items-center gap-1.5 py-4 after:absolute after:left-0 after:bottom-2 after:h-px after:bg-gradient-gold after:transition-all after:duration-500 hover:after:w-full ${
-                  isActive(l.to) ? "text-gold after:w-full" : "text-primary-foreground/85 hover:text-gold after:w-0"
-                }`}
+                href={l.to}
+                className={`relative text-[13px] font-medium tracking-wider transition-colors duration-300 flex items-center gap-1.5 py-4 after:absolute after:left-0 after:bottom-2 after:h-px after:bg-gradient-gold after:transition-all after:duration-500 hover:after:w-full ${isActive(l.to) ? "text-gold after:w-full" : "text-primary-foreground/85 hover:text-gold after:w-0"
+                  }`}
               >
                 {l.label}
                 {l.hasMega && <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${showMega ? "rotate-180" : ""}`} />}
@@ -152,7 +151,7 @@ export const Navbar = () => {
         </ul>
 
         <Link
-          to="/#contact"
+          href="/#contact"
           className="hidden lg:inline-flex items-center px-6 py-2.5 rounded-full bg-gradient-gold text-gold-foreground text-sm tracking-wide shadow-gold hover:-translate-y-0.5 transition-all duration-500"
         >
           Get a Quote
@@ -184,8 +183,8 @@ export const Navbar = () => {
                   <ul className="space-y-3">
                     {col.items.map((item) => (
                       <li key={item.label}>
-                        <Link 
-                          to={item.to} 
+                        <Link
+                          href={item.to}
                           onClick={() => setShowMega(false)}
                           className="text-[13px] text-primary-foreground/70 hover:text-gold transition-colors block py-0.5"
                         >
@@ -214,7 +213,7 @@ export const Navbar = () => {
               {links.map((l) => (
                 <li key={l.label}>
                   <Link
-                    to={l.to}
+                    href={l.to}
                     onClick={() => setOpen(false)}
                     className="block py-2 text-base text-primary-foreground/85 hover:text-gold transition-colors"
                   >
@@ -223,7 +222,7 @@ export const Navbar = () => {
                 </li>
               ))}
               <Link
-                to="/#contact"
+                href="/#contact"
                 onClick={() => setOpen(false)}
                 className="mt-2 inline-flex justify-center px-6 py-3 rounded-full bg-gradient-gold text-gold-foreground text-sm"
               >
@@ -236,3 +235,4 @@ export const Navbar = () => {
     </motion.header>
   );
 };
+
