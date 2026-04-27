@@ -46,7 +46,7 @@ const ProductDetail = () => {
     );
   }
 
-  const gallery = [product.image, product.image, product.image, product.image];
+  
 
   const share = async () => {
     try {
