@@ -1,7 +1,4 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/server";
 import { 
   Package, 
   Layers, 
@@ -11,37 +8,24 @@ import {
   ShoppingBag
 } from "lucide-react";
 
-export default function AdminDashboard() {
-  const [stats, setStats] = useState({
-    products: 0,
-    categories: 0,
-    collections: 0,
-  });
-  const [loading, setLoading] = useState(true);
+export default async function AdminDashboard() {
   const supabase = createClient();
 
-  useEffect(() => {
-    async function fetchStats() {
-      const [
-        { count: productCount },
-        { count: categoryCount },
-        { count: collectionCount }
-      ] = await Promise.all([
-        supabase.from("products").select("*", { count: "exact", head: true }),
-        supabase.from("categories").select("*", { count: "exact", head: true }),
-        supabase.from("collections").select("*", { count: "exact", head: true }),
-      ]);
+  const [
+    { count: productCount },
+    { count: categoryCount },
+    { count: collectionCount }
+  ] = await Promise.all([
+    supabase.from("products").select("*", { count: "exact", head: true }),
+    supabase.from("categories").select("*", { count: "exact", head: true }),
+    supabase.from("collections").select("*", { count: "exact", head: true }),
+  ]);
 
-      setStats({
-        products: productCount || 0,
-        categories: categoryCount || 0,
-        collections: collectionCount || 0,
-      });
-      setLoading(false);
-    }
-
-    fetchStats();
-  }, []);
+  const stats = {
+    products: productCount || 0,
+    categories: categoryCount || 0,
+    collections: collectionCount || 0,
+  };
 
   const statCards = [
     { name: "Total Products", value: stats.products, icon: Package, color: "bg-blue-500", trend: "+12%" },
@@ -72,7 +56,7 @@ export default function AdminDashboard() {
             <div className="mt-4">
               <p className="text-sm text-slate-500 font-medium">{stat.name}</p>
               <h3 className="text-2xl font-bold text-slate-800 mt-1">
-                {loading ? "..." : stat.value}
+                {stat.value}
               </h3>
             </div>
           </div>
