@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown, Diamond, Star, Heart, Users, Receipt, Briefcase } from "lucide-react";
+import { Menu, X, ChevronDown, Diamond, Star, Heart, Users, Receipt, Briefcase, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import logo from "@/assets/swastik-gold-logo-new.png";
+import { createClient } from "@/lib/supabase/client";
 
 const links = [
   { label: "Home", to: "/" },
@@ -98,14 +99,31 @@ export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [showMega, setShowMega] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const pathname = usePathname();
+  const supabase = createClient();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
     onScroll();
     window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    
+    // Check Auth
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+    };
+    checkUser();
+    
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      authListener.subscription.unsubscribe();
+    };
+  }, [supabase.auth]);
 
   const isActive = (to: string) => {
     if (to === "/") return pathname === "/";
@@ -150,12 +168,31 @@ export const Navbar = () => {
           ))}
         </ul>
 
-        <Link
-          href="/#contact"
-          className="hidden lg:inline-flex items-center px-6 py-2.5 rounded-full bg-gradient-gold text-gold-foreground text-sm tracking-wide shadow-gold hover:-translate-y-0.5 transition-all duration-500"
-        >
-          Get a Quote
-        </Link>
+        <div className="hidden lg:flex items-center gap-4">
+          {user ? (
+            <Link
+              href="/profile"
+              className="flex items-center gap-2 text-primary-foreground/85 hover:text-gold transition-colors text-sm font-medium tracking-wide"
+            >
+              <User size={18} />
+              <span>Profile</span>
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="flex items-center gap-2 text-primary-foreground/85 hover:text-gold transition-colors text-sm font-medium tracking-wide"
+            >
+              <User size={18} />
+              <span>Login</span>
+            </Link>
+          )}
+          <Link
+            href="/#contact"
+            className="inline-flex items-center px-6 py-2.5 rounded-full bg-gradient-gold text-gold-foreground text-sm tracking-wide shadow-gold hover:-translate-y-0.5 transition-all duration-500"
+          >
+            Get a Quote
+          </Link>
+        </div>
 
         <button aria-label="Toggle menu" className="lg:hidden p-2 text-gold" onClick={() => setOpen((v) => !v)}>
           {open ? <X size={22} /> : <Menu size={22} />}
@@ -227,6 +264,14 @@ export const Navbar = () => {
                 className="mt-2 inline-flex justify-center px-6 py-3 rounded-full bg-gradient-gold text-gold-foreground text-sm"
               >
                 Get a Quote
+              </Link>
+              <Link
+                href={user ? "/profile" : "/login"}
+                onClick={() => setOpen(false)}
+                className="mt-2 flex items-center justify-center gap-2 py-3 border border-gold/30 rounded-full text-gold text-sm"
+              >
+                <User size={16} />
+                {user ? "My Profile" : "Login / Register"}
               </Link>
             </ul>
           </motion.div>

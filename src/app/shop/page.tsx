@@ -1,7 +1,7 @@
 "use client";
-import { useMemo, useState, Suspense } from "react";
+import { useEffect, useMemo, useState, Suspense } from "react";
 import { motion } from "framer-motion";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Search, SlidersHorizontal, X, Loader2 } from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { FloatingActions } from "@/components/site/FloatingActions";
@@ -12,8 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CATEGORIES, GENDERS, PURITIES, PRICE_RANGES, PRODUCTS, type Product } from "@/data/products";
+import { GENDERS, PURITIES, PRICE_RANGES, type Product } from "@/data/products";
 import { useSearchParams } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 const PAGE_SIZE = 12;
 
@@ -40,6 +41,7 @@ const Toggle = ({
 );
 
 const FiltersPanel = ({
+  allCategories,
   cats,
   setCats,
   genders,
@@ -56,7 +58,7 @@ const FiltersPanel = ({
       <button onClick={reset} className="text-xs text-primary hover:underline">Reset</button>
     </div>
     <Section title="Category">
-      {CATEGORIES.map((c) => (
+      {allCategories.map((c: string) => (
         <Toggle key={c} label={c} checked={cats.includes(c)} onChange={(v) => setCats(v ? [...cats, c] : cats.filter((x: string) => x !== c))} />
       ))}
     </Section>
@@ -90,12 +92,49 @@ const Shop = () => {
   const [page, setPage] = useState(1);
   const [quote, setQuote] = useState<Product | null>(null);
 
+  const [dbProducts, setDbProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      const { data, error } = await supabase.from('products').select('*, categories(name)');
+      
+      if (data && !error) {
+        const mapped: Product[] = data.map((p: any) => ({
+          id: p.id,
+          sku: `SG-${p.id?.substring(0, 4) || '1000'}`,
+          name: p.name,
+          category: p.categories?.name || 'Uncategorized',
+          gender: 'Ladies Jewellery', // Default fallback
+          purity: '22Kt', // Default fallback
+          weight: 10,
+          stones: 'None',
+          price: p.price || 0,
+          image: p.image_url || 'https://images.unsplash.com/photo-1599643478514-4a7f0528e578?w=800&q=80',
+          trending: false,
+          newArrival: true,
+          createdAt: new Date(p.created_at || Date.now()).getTime(),
+        }));
+        setDbProducts(mapped);
+      }
+      setLoading(false);
+    };
+    fetchProducts();
+  }, []);
+
   const reset = () => {
     setCats([]); setGenders([]); setPurities([]); setPrices([]); setSearch("");
   };
 
+  const allCategories = useMemo(() => {
+    const uniqueCats = Array.from(new Set(dbProducts.map(p => p.category)));
+    return uniqueCats.sort();
+  }, [dbProducts]);
+
   const filtered = useMemo(() => {
-    let arr = PRODUCTS.filter((p) => {
+    let arr = dbProducts.filter((p) => {
       if (cats.length && !cats.includes(p.category)) return false;
       if (genders.length && !genders.includes(p.gender)) return false;
       if (purities.length && !purities.includes(p.purity)) return false;
@@ -111,7 +150,7 @@ const Shop = () => {
     else if (sort === "trending") arr = [...arr].sort((a, b) => Number(!!b.trending) - Number(!!a.trending));
     else arr = [...arr].sort((a, b) => b.createdAt - a.createdAt);
     return arr;
-  }, [cats, genders, purities, prices, search, sort]);
+  }, [dbProducts, cats, genders, purities, prices, search, sort]);
 
   const visible = filtered.slice(0, page * PAGE_SIZE);
 
@@ -134,7 +173,7 @@ const Shop = () => {
         <div className="container-luxe grid lg:grid-cols-[260px_1fr] gap-10">
           {/* Sidebar */}
           <aside className="hidden lg:block sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto pr-2">
-            <FiltersPanel {...{ cats, setCats, genders, setGenders, purities, setPurities, prices, setPrices, reset }} />
+            <FiltersPanel {...{ allCategories, cats, setCats, genders, setGenders, purities, setPurities, prices, setPrices, reset }} />
           </aside>
 
           {/* Main */}
@@ -159,7 +198,7 @@ const Shop = () => {
                   <Button variant="outline" className="lg:hidden gap-2"><SlidersHorizontal size={16} /> Filters</Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-[320px] overflow-y-auto bg-background">
-                  <FiltersPanel {...{ cats, setCats, genders, setGenders, purities, setPurities, prices, setPrices, reset }} />
+                  <FiltersPanel {...{ allCategories, cats, setCats, genders, setGenders, purities, setPurities, prices, setPrices, reset }} />
                 </SheetContent>
               </Sheet>
             </div>
@@ -180,21 +219,30 @@ const Shop = () => {
 
             <div className="text-sm text-muted-foreground mb-4">{filtered.length} products</div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-              {visible.map((p) => (
-                <ProductCard key={p.id} product={p} onQuickView={(prod) => setQuote(prod)} />
-              ))}
-            </div>
-
-            {visible.length < filtered.length && (
-              <div className="flex justify-center mt-12">
-                <Button onClick={() => setPage((p) => p + 1)} className="bg-gradient-primary text-primary-foreground hover:shadow-elegant px-8">
-                  Load More
-                </Button>
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-20 text-gold-500">
+                <Loader2 className="w-10 h-10 animate-spin mb-4" />
+                <p>Loading collection...</p>
               </div>
-            )}
-            {filtered.length === 0 && (
-              <div className="text-center py-20 text-muted-foreground">No products match your filters.</div>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+                  {visible.map((p) => (
+                    <ProductCard key={p.id} product={p} onQuickView={(prod) => setQuote(prod)} />
+                  ))}
+                </div>
+
+                {visible.length < filtered.length && (
+                  <div className="flex justify-center mt-12">
+                    <Button onClick={() => setPage((p) => p + 1)} className="bg-gradient-primary text-primary-foreground hover:shadow-elegant px-8">
+                      Load More
+                    </Button>
+                  </div>
+                )}
+                {filtered.length === 0 && (
+                  <div className="text-center py-20 text-muted-foreground">No products match your filters.</div>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -216,4 +264,3 @@ const ShopPage = () => {
 };
 
 export default ShopPage;
-

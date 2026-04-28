@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import heroImage from "@/assets/hero-jewellery.jpg";
 

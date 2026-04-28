@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect } from "react";
 import { Navbar } from "@/components/site/Navbar";
 import { CreateYourOwn } from "@/components/site/CreateYourOwn";

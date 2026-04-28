@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, Clock, Instagram, Facebook, Youtube, Twitter } from "lucide-react";
 import { Navbar } from "@/components/site/Navbar";

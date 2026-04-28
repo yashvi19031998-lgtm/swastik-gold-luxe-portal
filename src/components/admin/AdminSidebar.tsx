@@ -8,7 +8,8 @@ import {
   Tags, 
   Package, 
   LogOut,
-  ChevronRight
+  ChevronRight,
+  Users
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -16,6 +17,7 @@ import { useRouter } from "next/navigation";
 
 const sidebarLinks = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { name: "Users", href: "/admin/users", icon: Users },
   { name: "Collections", href: "/admin/collections", icon: Layers },
   { name: "Categories", href: "/admin/categories", icon: Tags },
   { name: "Products", href: "/admin/products", icon: Package },
@@ -34,8 +36,8 @@ export function AdminSidebar() {
   return (
     <div className="flex flex-col w-64 bg-slate-900 text-white min-h-screen">
       <div className="p-6 border-b border-slate-800">
-        <h1 className="text-xl font-bold tracking-tight text-gold-500 flex items-center gap-2">
-          Swastik Gold <span className="text-xs bg-gold-500/20 text-gold-500 px-2 py-0.5 rounded-full">Admin</span>
+        <h1 className="text-xl font-bold tracking-tight text-gold flex items-center gap-2">
+          Swastik Gold <span className="text-xs bg-gold/20 text-gold px-2 py-0.5 rounded-full">Admin</span>
         </h1>
       </div>
       
@@ -49,12 +51,12 @@ export function AdminSidebar() {
               className={cn(
                 "flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 group",
                 isActive 
-                  ? "bg-gold-500 text-slate-900 font-medium" 
+                  ? "bg-gold text-slate-900 font-medium" 
                   : "text-slate-400 hover:bg-slate-800 hover:text-white"
               )}
             >
               <div className="flex items-center gap-3">
-                <link.icon className={cn("w-5 h-5", isActive ? "text-slate-900" : "text-slate-400 group-hover:text-gold-500")} />
+                <link.icon className={cn("w-5 h-5", isActive ? "text-slate-900" : "text-slate-400 group-hover:text-gold")} />
                 <span>{link.name}</span>
               </div>
               {isActive && <ChevronRight className="w-4 h-4" />}
