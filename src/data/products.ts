@@ -14,7 +14,7 @@ import wedding from "@/assets/coll-wedding.jpg";
 import engagement from "@/assets/coll-engagement.jpg";
 import daily from "@/assets/coll-daily.jpg";
 
-export const CATEGORY_IMAGES: Record<string, string> = {
+export const CATEGORY_IMAGES: Record<string, any> = {
   Anklets: anklets,
   Bangles: bangles,
   Bracelet: bracelet,
@@ -57,7 +57,7 @@ export type Product = {
   weight: number; // grams
   stones: string;
   price: number;
-  image: string;
+  image: any;
   trending?: boolean;
   newArrival?: boolean;
   createdAt: number;
