@@ -3,7 +3,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { Hero } from "@/components/site/Hero";
 import { WhyChooseUs } from "@/components/site/WhyChooseUs";
 import { Collections } from "@/components/site/Collections";
-import { CreateYourOwn } from "@/components/site/CreateYourOwn";
+import { LatestArrivals } from "@/components/site/LatestArrivals";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
@@ -34,7 +34,7 @@ const Index = () => {
       <Hero />
       <WhyChooseUs />
       <Collections />
-      <CreateYourOwn />
+      <LatestArrivals />
       <Testimonials />
       <Contact />
       <Footer />
