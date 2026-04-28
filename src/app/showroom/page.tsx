@@ -40,6 +40,7 @@ const Showroom = () => {
     },
   ];
 
+
   const socials = [
     { icon: Facebook, href: "#", label: "Facebook" },
     { icon: Instagram, href: "#", label: "Instagram" },
@@ -54,7 +55,7 @@ const Showroom = () => {
       <section className="pt-32 pb-20 md:pt-44 md:pb-32 overflow-hidden">
         <div className="container-luxe">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
-            
+
             {/* Left: Content & Info */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -65,12 +66,12 @@ const Showroom = () => {
                 <MapPin className="w-3.5 h-3.5 text-gold-deep" />
                 <span className="text-xs tracking-[0.2em] uppercase text-foreground/70">Flagship Store</span>
               </div>
-              
+
               <h1 className="font-serif text-4xl md:text-6xl leading-tight">
                 Visit Our <br />
                 <span className="italic text-gold-gradient text-5xl md:text-7xl">Showroom</span>
               </h1>
-              
+
               <p className="mt-8 text-lg text-muted-foreground leading-relaxed max-w-xl">
                 Experience our exquisite collection in person. Our elegant showroom provides the perfect setting to discover your next treasured piece.
               </p>
@@ -152,7 +153,7 @@ const Showroom = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Floating Badge */}
               <div className="absolute -top-6 -right-6 w-32 h-32 bg-gold-deep rounded-full flex items-center justify-center p-4 shadow-xl border-4 border-background animate-float cursor-default z-20">
                 <div className="text-center">
