@@ -10,12 +10,13 @@ import { type Product } from "@/data/products";
 // Static Motion Wrapper because motion needs a client component, but we can wrap parts of it
 import { ShopHeader } from "../../components/site/ShopHeader";
 
+
 export default async function ShopPage() {
   const supabase = createClient();
-  
+
   // Fetch products on the server
   const { data, error } = await supabase.from('products').select('*, categories(name)');
-  
+
   let initialProducts: Product[] = [];
   if (data && !error) {
     initialProducts = data.map((p: any) => ({
