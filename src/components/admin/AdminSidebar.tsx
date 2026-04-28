@@ -9,7 +9,8 @@ import {
   Package, 
   LogOut,
   ChevronRight,
-  Users
+  Users,
+  Building2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -18,6 +19,7 @@ import { useRouter } from "next/navigation";
 const sidebarLinks = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Users", href: "/admin/users", icon: Users },
+  { name: "Parties", href: "/admin/parties", icon: Building2 },
   { name: "Collections", href: "/admin/collections", icon: Layers },
   { name: "Categories", href: "/admin/categories", icon: Tags },
   { name: "Products", href: "/admin/products", icon: Package },

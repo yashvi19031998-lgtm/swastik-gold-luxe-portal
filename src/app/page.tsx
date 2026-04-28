@@ -7,6 +7,7 @@ import { LatestArrivals } from "@/components/site/LatestArrivals";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
+import { BannerSection } from "@/components/site/BannerSection";
 import { FloatingActions } from "@/components/site/FloatingActions";
 
 export const metadata: Metadata = {
@@ -36,6 +37,7 @@ const Index = () => {
       <Collections />
       <LatestArrivals />
       <Testimonials />
+      <BannerSection />
       <Contact />
       <Footer />
       <FloatingActions />

@@ -1,11 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
-import { 
-  Package, 
-  Layers, 
-  Tags, 
-  TrendingUp, 
+import Link from "next/link";
+import {
+  Package,
+  Layers,
+  Tags,
+  TrendingUp,
   Users,
-  ShoppingBag
+  ShoppingBag,
+  Building2
 } from "lucide-react";
 
 export default async function AdminDashboard() {
@@ -14,24 +16,27 @@ export default async function AdminDashboard() {
   const [
     { count: productCount },
     { count: categoryCount },
-    { count: collectionCount }
+    { count: collectionCount },
+    { count: partyCount }
   ] = await Promise.all([
     supabase.from("products").select("*", { count: "exact", head: true }),
     supabase.from("categories").select("*", { count: "exact", head: true }),
     supabase.from("collections").select("*", { count: "exact", head: true }),
+    supabase.from("parties").select("*", { count: "exact", head: true }),
   ]);
 
   const stats = {
     products: productCount || 0,
     categories: categoryCount || 0,
     collections: collectionCount || 0,
+    parties: partyCount || 0,
   };
 
   const statCards = [
     { name: "Total Products", value: stats.products, icon: Package, color: "bg-blue-500", trend: "+12%" },
     { name: "Total Categories", value: stats.categories, icon: Tags, color: "bg-purple-500", trend: "+2%" },
     { name: "Total Collections", value: stats.collections, icon: Layers, color: "bg-gold-500", trend: "+5%" },
-    { name: "Active Users", value: "1,284", icon: Users, color: "bg-green-500", trend: "+18%" },
+    { name: "Total Parties", value: stats.parties, icon: Building2, color: "bg-emerald-500", trend: "+8%" },
   ];
 
   return (
@@ -87,18 +92,18 @@ export default async function AdminDashboard() {
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <h2 className="text-lg font-bold text-slate-800 mb-6">Quick Actions</h2>
           <div className="grid grid-cols-2 gap-4">
-            <button className="flex flex-col items-center gap-3 p-4 border border-dashed border-slate-200 rounded-2xl hover:border-gold-500 hover:bg-gold-50/30 transition-all group">
+            <Link href="/admin/products" className="flex flex-col items-center gap-3 p-4 border border-dashed border-slate-200 rounded-2xl hover:border-gold-500 hover:bg-gold-50/30 transition-all group text-center">
               <div className="p-3 bg-slate-50 rounded-xl group-hover:bg-white">
                 <Package className="w-6 h-6 text-slate-400 group-hover:text-gold-500" />
               </div>
               <span className="text-sm font-semibold text-slate-600 group-hover:text-gold-600">Add Product</span>
-            </button>
-            <button className="flex flex-col items-center gap-3 p-4 border border-dashed border-slate-200 rounded-2xl hover:border-gold-500 hover:bg-gold-50/30 transition-all group">
+            </Link>
+            <Link href="/admin/parties" className="flex flex-col items-center gap-3 p-4 border border-dashed border-slate-200 rounded-2xl hover:border-gold-500 hover:bg-gold-50/30 transition-all group text-center">
               <div className="p-3 bg-slate-50 rounded-xl group-hover:bg-white">
-                <Layers className="w-6 h-6 text-slate-400 group-hover:text-gold-500" />
+                <Building2 className="w-6 h-6 text-slate-400 group-hover:text-gold-500" />
               </div>
-              <span className="text-sm font-semibold text-slate-600 group-hover:text-gold-600">New Collection</span>
-            </button>
+              <span className="text-sm font-semibold text-slate-600 group-hover:text-gold-600">New Party</span>
+            </Link>
           </div>
         </div>
       </div>
