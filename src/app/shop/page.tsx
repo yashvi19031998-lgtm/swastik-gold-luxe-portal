@@ -14,26 +14,35 @@ import { ShopHeader } from "../../components/site/ShopHeader";
 export default async function ShopPage() {
   const supabase = createClient();
 
-  // Fetch products on the server
-  const { data, error } = await supabase.from('products').select('*, categories(name)');
+  // Fetch products with images on the server
+  const { data, error } = await supabase
+    .from('products')
+    .select('*, categories(name), product_images(image_url)')
+    .order('created_at', { ascending: false });
 
   let initialProducts: Product[] = [];
   if (data && !error) {
-    initialProducts = data.map((p: any) => ({
-      id: p.id,
-      sku: `SG-${p.id?.substring(0, 4) || '1000'}`,
-      name: p.name,
-      category: p.categories?.name || 'Uncategorized',
-      gender: 'Ladies Jewellery', // Default fallback
-      purity: '22Kt', // Default fallback
-      weight: 10,
-      stones: 'None',
-      price: p.price || 0,
-      image: p.image_url || 'https://images.unsplash.com/photo-1599643478514-4a7f0528e578?w=800&q=80',
-      trending: false,
-      newArrival: true,
-      createdAt: new Date(p.created_at || Date.now()).getTime(),
-    }));
+    initialProducts = data.map((p: any) => {
+      // Get first image from product_images join, fallback to placeholder
+      const firstImage =
+        p.product_images?.[0]?.image_url ||
+        'https://images.unsplash.com/photo-1599643478514-4a7f0528e578?w=800&q=80';
+      return {
+        id: p.id,
+        sku: `SG-${p.id?.substring(0, 4) || '1000'}`,
+        name: p.name,
+        category: p.categories?.name || 'Uncategorized',
+        gender: p.gender || 'Ladies Jewellery',
+        purity: p.purity || '22Kt',
+        weight: 10,
+        stones: 'None',
+        price: p.price || 0,
+        image: firstImage,
+        trending: false,
+        newArrival: true,
+        createdAt: new Date(p.created_at || Date.now()).getTime(),
+      };
+    });
   }
 
   return (
