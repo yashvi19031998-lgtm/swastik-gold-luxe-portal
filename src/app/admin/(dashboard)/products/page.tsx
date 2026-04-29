@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { upsertProduct, deleteProductImages, insertProductImages } from "@/app/actions/product";
+import { upsertProduct, deleteProductImages, insertProductImages, uploadProductImageToStorage } from "@/app/actions/product";
 import { 
   Plus, 
   Search, 
@@ -211,17 +211,16 @@ export default function ProductsPage() {
           const fileExt = image.name.split('.').pop();
           const fileName = `${productId}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
           
-          const { error: uploadError } = await supabase.storage
-            .from("products")
-            .upload(fileName, image);
+          const formData = new FormData();
+          formData.append("file", image);
+          formData.append("fileName", fileName);
 
-          if (uploadError) throw uploadError;
-
-          const { data: { publicUrl } } = supabase.storage
-            .from("products")
-            .getPublicUrl(fileName);
+          const uploadResult = await uploadProductImageToStorage(formData);
+          if (!uploadResult.success) {
+            throw new Error(uploadResult.error || "Failed to upload image");
+          }
             
-          newImageUrls.push(publicUrl);
+          newImageUrls.push(uploadResult.publicUrl as string);
         }
         
         if (newImageUrls.length > 0) {

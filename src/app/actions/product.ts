@@ -92,3 +92,29 @@ export async function insertProductImages(productId: string, imageUrls: string[]
     return { success: false, error: error.message };
   }
 }
+
+export async function uploadProductImageToStorage(formData: FormData) {
+  try {
+    const file = formData.get("file") as File;
+    const fileName = formData.get("fileName") as string;
+    
+    if (!file || !fileName) {
+      throw new Error("Missing file or fileName");
+    }
+
+    const { error } = await supabaseAdmin.storage
+      .from("products")
+      .upload(fileName, file);
+
+    if (error) throw error;
+
+    const { data: { publicUrl } } = supabaseAdmin.storage
+      .from("products")
+      .getPublicUrl(fileName);
+
+    return { success: true, publicUrl };
+  } catch (error: any) {
+    console.error("Supabase Admin Error (upload storage):", error);
+    return { success: false, error: error.message };
+  }
+}

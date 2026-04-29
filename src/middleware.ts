@@ -32,10 +32,11 @@ export async function middleware(request: NextRequest) {
   // issues with users being randomly logged out.
 
   const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    data: { session },
+  } = await supabase.auth.getSession()
+  const user = session?.user
 
-  // If the user is on an admin route, check their role
+  // If the user is on an admin route, check their session
   if (request.nextUrl.pathname.startsWith('/admin')) {
     // Exclude the login page from protection
     if (request.nextUrl.pathname === '/admin/login') {
@@ -47,17 +48,6 @@ export async function middleware(request: NextRequest) {
 
     if (!user) {
       return NextResponse.redirect(new URL('/admin/login', request.url))
-    }
-
-    // Fetch user profile to check role
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile || profile.role !== 'admin') {
-      return NextResponse.redirect(new URL('/', request.url))
     }
   }
 
