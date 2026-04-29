@@ -18,9 +18,9 @@ const SLIDES = [
   {
     id: 0,
     tag: "Wholesale Since 1998",
-    headline: ["Trusted Wholesale", "Gold Jewellery"],
-    accent: "Gold Jewellery",
-    sub: "BIS Hallmarked. Pan-India Delivery. Premium craftsmanship direct from our Ahmedabad atelier to your showroom.",
+    headline: ["Timeless", "Elegance"],
+    accent: "Elegance",
+    sub: "BIS Hallmarked. Pan-India Delivery. Premium craftsmanship direct from our atelier to your showroom.",
     cta: { label: "Explore Catalogue", href: "/collection" },
     cta2: { label: "Get a Quote", href: "/#contact" },
     img: heroImage,
@@ -85,9 +85,9 @@ export const Hero = () => {
 
   /* Framer variants */
   const imgVariants = {
-    enter:  (dir: number) => ({ x: dir > 0 ? "6%" : "-6%", opacity: 0, scale: 1.04 }),
-    center: { x: "0%", opacity: 1, scale: 1 },
-    exit:   (dir: number) => ({ x: dir > 0 ? "-6%" : "6%", opacity: 0, scale: 0.97 }),
+    enter:  (dir: number) => ({ x: dir > 0 ? "4%" : "-4%", opacity: 0, scale: 1.08 }),
+    center: { x: "0%", opacity: 1, scale: 1.05 }, // Added subtle zoom-in scale 1.05
+    exit:   (dir: number) => ({ x: dir > 0 ? "-4%" : "4%", opacity: 0, scale: 1 }),
   };
 
   const textVariants = {
