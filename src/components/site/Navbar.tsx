@@ -11,7 +11,7 @@ const links = [
   { label: "Home", to: "/" },
   { label: "Catalogue", to: "/collection" },
   { label: "Shop", to: "/shop", hasMega: true },
-  { label: "Wholesale", to: "/#contact" },
+  { label: "Wholesale", to: "/wholesale" },
   { label: "Custom Design", to: "/custom-design" },
   { label: "Showroom", to: "/showroom" },
   { label: "Contact", to: "/#contact" },
