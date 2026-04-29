@@ -1,5 +1,30 @@
 {
-  "node": {},
+  "node": {
+    "60a4cd651309a62842e99eeb14c4b33d6688103e": {
+      "workers": {
+        "app/admin/(dashboard)/products/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22D%3A%5C%5CResume%5C%5Cswastik-gold-luxe-portal%5C%5Csrc%5C%5Capp%5C%5Cactions%5C%5Cproduct.ts%22%2C%5B%22insertProductImages%22%2C%22deleteProductImages%22%2C%22upsertProduct%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/admin/(dashboard)/products/page": "action-browser"
+      }
+    },
+    "a7c21016bdb771d45acc41247544dc928b061a3c": {
+      "workers": {
+        "app/admin/(dashboard)/products/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22D%3A%5C%5CResume%5C%5Cswastik-gold-luxe-portal%5C%5Csrc%5C%5Capp%5C%5Cactions%5C%5Cproduct.ts%22%2C%5B%22insertProductImages%22%2C%22deleteProductImages%22%2C%22upsertProduct%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/admin/(dashboard)/products/page": "action-browser"
+      }
+    },
+    "acc794697d916114924bf175afc83d5f1937eca3": {
+      "workers": {
+        "app/admin/(dashboard)/products/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22D%3A%5C%5CResume%5C%5Cswastik-gold-luxe-portal%5C%5Csrc%5C%5Capp%5C%5Cactions%5C%5Cproduct.ts%22%2C%5B%22insertProductImages%22%2C%22deleteProductImages%22%2C%22upsertProduct%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/admin/(dashboard)/products/page": "action-browser"
+      }
+    }
+  },
   "edge": {},
-  "encryptionKey": "h4hkojHYlgvTmrrQoiyZH3323TvJRc7gh+qBhuUYrMg="
+  "encryptionKey": "24k9M8Q0TfdOUnelpv44E8iBsMi0G73k7Z1pbsKDwYs="
 }

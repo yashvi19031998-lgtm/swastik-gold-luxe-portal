@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { ProductCard } from "@/components/site/ProductCard";
@@ -79,8 +79,15 @@ const FiltersPanel = ({
 
 export const ShopContent = ({ initialProducts }: { initialProducts: Product[] }) => {
   const params = useSearchParams();
-  const initialCat = params.get("category");
-  const [cats, setCats] = useState<string[]>(initialCat ? [initialCat] : []);
+  const dbProducts = initialProducts;
+
+  const allCategories = useMemo(() => {
+    const uniqueCats = Array.from(new Set(dbProducts.map(p => p.category)));
+    return uniqueCats.sort();
+  }, [dbProducts]);
+
+  // Initial state setup from URL params
+  const [cats, setCats] = useState<string[]>([]);
   const [genders, setGenders] = useState<string[]>([]);
   const [purities, setPurities] = useState<string[]>([]);
   const [prices, setPrices] = useState<string[]>([]);
@@ -89,16 +96,52 @@ export const ShopContent = ({ initialProducts }: { initialProducts: Product[] })
   const [page, setPage] = useState(1);
   const [quote, setQuote] = useState<Product | null>(null);
 
-  const dbProducts = initialProducts;
+  // Sync state with URL params
+  useEffect(() => {
+    const catParam = params.get("cat") || params.get("category");
+    const genderParam = params.get("gender");
+    const purityParam = params.get("purity");
+    const priceParam = params.get("price");
+
+    if (catParam) {
+      const match = allCategories.find(c => c.toLowerCase() === catParam.toLowerCase());
+      if (match) setCats([match]);
+    } else {
+      setCats([]);
+    }
+
+    if (genderParam) {
+      const match = GENDERS.find(g => g.toLowerCase().includes(genderParam.toLowerCase()));
+      if (match) setGenders([match as string]);
+    } else {
+      setGenders([]);
+    }
+
+    if (purityParam) {
+      const match = PURITIES.find(p => p.toLowerCase() === purityParam.toLowerCase());
+      if (match) setPurities([match as string]);
+    } else {
+      setPurities([]);
+    }
+
+    if (priceParam) {
+      const match = PRICE_RANGES.find(p => {
+        if (priceParam === "upto10") return p.label.includes("10,000");
+        if (priceParam === "10-25") return p.label.includes("10K to ₹25K");
+        if (priceParam === "25-50") return p.label.includes("25K to ₹50K");
+        if (priceParam === "50-100") return p.label.includes("50K to ₹1 Lakh");
+        if (priceParam === "above100") return p.label.includes("Above ₹1 Lakh");
+        return false;
+      });
+      if (match) setPrices([match.label]);
+    } else {
+      setPrices([]);
+    }
+  }, [params, allCategories]);
 
   const reset = () => {
     setCats([]); setGenders([]); setPurities([]); setPrices([]); setSearch("");
   };
-
-  const allCategories = useMemo(() => {
-    const uniqueCats = Array.from(new Set(dbProducts.map(p => p.category)));
-    return uniqueCats.sort();
-  }, [dbProducts]);
 
   const filtered = useMemo(() => {
     let arr = dbProducts.filter((p) => {

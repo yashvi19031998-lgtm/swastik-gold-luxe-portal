@@ -91,7 +91,7 @@ export const Collections = () => {
               transition={{ duration: 0.7, delay: i * 0.08 }}
               className={`group relative rounded-2xl overflow-hidden shadow-card hover:shadow-elegant transition-all duration-700 ${it.span} ${i === 0 ? "min-h-[24rem]" : "min-h-[18rem]"}`}
             >
-              <Link href={`/shop?category=${encodeURIComponent(it.name)}`} className="absolute inset-0 z-10" aria-label={it.name} />
+              <Link href={`/shop?cat=${encodeURIComponent(it.name)}`} className="absolute inset-0 z-10" aria-label={it.name} />
               <img
                 src={typeof it.img === "string" ? it.img : (it.img as any).src}
                 alt={`${it.name} - luxury wholesale gold jewellery`}

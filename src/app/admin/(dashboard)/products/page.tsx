@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { upsertProduct, deleteProductImages, insertProductImages } from "@/app/actions/product";
 import { 
   Plus, 
   Search, 
@@ -165,24 +166,25 @@ export default function ProductsPage() {
     try {
       let productId = currentProduct?.id;
 
-      if (currentProduct) {
-        // 1. Update Product Details
-        const { error: updateError } = await supabase
-          .from("products")
-          .update({
-            name: formData.name,
-            price: parseFloat(formData.price),
-            description: formData.description,
-            category_id: formData.category_id,
-            gender: formData.gender,
-            purity: formData.purity
-          })
-          .eq("id", productId);
-        
-        if (updateError) throw updateError;
+      // 1. Upsert Product Details via Server Action
+      const upsertResult = await upsertProduct({
+        id: productId,
+        name: formData.name,
+        price: parseFloat(formData.price),
+        description: formData.description,
+        category_id: formData.category_id,
+        gender: formData.gender,
+        purity: formData.purity
+      });
 
+      if (!upsertResult.success) {
+        throw new Error(upsertResult.error);
+      }
+      productId = upsertResult.productId;
+
+      if (currentProduct) {
         // 2. Handle Image Sync for existing products
-        // First, get currently stored images in DB
+        // First, get currently stored images in DB (using normal client is fine for SELECT)
         const { data: existingImages } = await supabase
           .from("product_images")
           .select("id, image_url")
@@ -190,36 +192,21 @@ export default function ProductsPage() {
 
         // Remove images from DB that are no longer in the preview list
         if (existingImages) {
-          const imagesToDelete = existingImages.filter(
-            img => !imagePreviews.includes(img.image_url)
-          );
+          const imagesToDelete = existingImages
+            .filter(img => !imagePreviews.includes(img.image_url))
+            .map(img => img.id);
 
-          for (const img of imagesToDelete) {
-            await supabase.from("product_images").delete().eq("id", img.id);
-            // Optional: delete from storage too if you track paths
+          if (imagesToDelete.length > 0) {
+            const delResult = await deleteProductImages(imagesToDelete);
+            if (!delResult.success) throw new Error(delResult.error);
           }
         }
-      } else {
-        // Insert New Product
-        const { data, error: insertError } = await supabase
-          .from("products")
-          .insert([{
-            name: formData.name,
-            price: parseFloat(formData.price),
-            description: formData.description,
-            category_id: formData.category_id,
-            gender: formData.gender,
-            purity: formData.purity
-          }])
-          .select()
-          .single();
-        
-        if (insertError) throw insertError;
-        productId = data.id;
       }
 
       // 3. Upload New Images (those in 'images' state)
       if (images.length > 0) {
+        const newImageUrls: string[] = [];
+        
         for (const image of images) {
           const fileExt = image.name.split('.').pop();
           const fileName = `${productId}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
@@ -233,12 +220,13 @@ export default function ProductsPage() {
           const { data: { publicUrl } } = supabase.storage
             .from("products")
             .getPublicUrl(fileName);
-
-          const { error: imgDbError } = await supabase
-            .from("product_images")
-            .insert([{ product_id: productId, image_url: publicUrl }]);
-          
-          if (imgDbError) throw imgDbError;
+            
+          newImageUrls.push(publicUrl);
+        }
+        
+        if (newImageUrls.length > 0) {
+          const insertResult = await insertProductImages(productId as string, newImageUrls);
+          if (!insertResult.success) throw new Error(insertResult.error);
         }
       }
 
