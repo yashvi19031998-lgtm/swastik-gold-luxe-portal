@@ -274,7 +274,7 @@ export const LatestArrivals = () => {
                 <div className="relative aspect-[4/5] md:aspect-square rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl group">
                   <img
                     src={products[currentIndex].imageUrl}
-                    alt={products[currentIndex].name}
+                    alt={`${products[currentIndex].name} — ${products[currentIndex].categoryName} by Swastik Gold`}
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/80 via-transparent to-transparent" />

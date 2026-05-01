@@ -115,7 +115,7 @@ export const Hero = () => {
         >
           <img
             src={getImg(slide.img)}
-            alt="Swastik Gold jewellery"
+            alt={`${slide.headline.join(" ")} — Swastik Gold Luxe Jewellery`}
             className="w-full h-full object-cover object-center"
           />
           {/* Directional gradient overlay */}
