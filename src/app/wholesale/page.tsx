@@ -53,7 +53,7 @@ const benefits = [
   {
     icon: Gem,
     title: "Exclusive Designs First",
-    desc: "Wholesale partners get early access to new arrivals and festival collections before they go public.",
+    desc: "Wholesale clients get early access to new arrivals and festival collections before they go public.",
   },
 ];
 
@@ -67,20 +67,20 @@ const steps = [
 
 const faqs = [
   {
-    q: "What is the minimum order value to become a wholesale partner?",
-    a: "There is no fixed minimum order value for partnership registration. However, preferential pricing starts from orders of ₹1 Lakh and above. We work with jewellery shops of all scales.",
+    q: "What is the minimum order value for wholesale pricing?",
+    a: "There is no fixed minimum order value for account registration. However, preferential pricing starts from orders of ₹1 Lakh and above. We work with jewellery shops of all scales.",
   },
   {
     q: "Do you offer credit / payment terms?",
-    a: "Credit terms are available for verified partners with established trading history. Initial orders are typically on advance payment. Speak to your account manager for details.",
+    a: "Credit terms are available for verified clients with established trading history. Initial orders are typically on advance payment. Speak to your account manager for details.",
   },
   {
     q: "Can I get exclusive pieces not listed in the public catalogue?",
-    a: "Yes. Wholesale partners can request custom or exclusive designs. Minimum quantities apply for bespoke production runs.",
+    a: "Yes. Wholesale clients can request custom or exclusive designs. Minimum quantities apply for bespoke production runs.",
   },
   {
     q: "Is there a registration or membership fee?",
-    a: "No. Becoming a Swastik Gold wholesale partner is completely free. We earn when you earn.",
+    a: "No. Registering for a Swastik Gold wholesale account is completely free. We earn when you earn.",
   },
   {
     q: "Do you ship outside India?",
@@ -110,10 +110,25 @@ export default function WholesalePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
-    // Simulate API call — replace with your Supabase insert / email service
-    await new Promise((r) => setTimeout(r, 1500));
-    setSending(false);
-    setSent(true);
+    
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      if (response.ok) {
+        setSent(true);
+      } else {
+        alert("Something went wrong. Please try again or contact us via phone.");
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      alert("Failed to send enquiry. Please check your internet connection.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -130,7 +145,7 @@ export default function WholesalePage() {
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/10 border border-gold/25 mb-6">
               <Star className="w-3.5 h-3.5 text-gold" />
               <span className="text-[11px] tracking-[0.22em] uppercase text-gold font-semibold">
-                B2B Wholesale Partner Program
+                B2B Wholesale Inquiry
               </span>
             </div>
 
@@ -140,7 +155,7 @@ export default function WholesalePage() {
             </h1>
 
             <p className="text-slate-300 text-lg leading-relaxed max-w-2xl mx-auto mb-10">
-              Join 200+ retail partners across India who trust Swastik Gold for BIS-hallmarked, competitively-priced
+              Join 200+ retail clients across India who trust Swastik Gold for BIS-hallmarked, competitively-priced
               wholesale jewellery — direct from our Ahmedabad atelier.
             </p>
 
@@ -149,10 +164,10 @@ export default function WholesalePage() {
                 href="#enquiry"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gradient-gold text-gold-foreground font-semibold text-sm tracking-wide shadow-gold hover:-translate-y-0.5 transition-all"
               >
-                Become a Partner
+                Send Enquiry
               </a>
               <a
-                href="tel:+919974878332"
+                href={`tel:${CONTACT_INFO.phoneRaw}`}
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border border-gold/30 text-gold hover:bg-gold/10 font-semibold text-sm tracking-wide transition-all"
               >
                 <Phone className="w-4 h-4" />
@@ -163,7 +178,7 @@ export default function WholesalePage() {
             {/* Stats */}
             <div className="mt-14 grid grid-cols-3 gap-6 max-w-lg mx-auto">
               {[
-                { val: "200+", label: "Retail Partners" },
+                { val: "500+", label: "Retail Clients" },
                 { val: "15+", label: "Categories" },
                 { val: "Since 1998", label: "In Business" },
               ].map((s) => (
@@ -187,7 +202,7 @@ export default function WholesalePage() {
             transition={{ duration: 0.6 }}
             className="text-center mb-14"
           >
-            <div className="text-xs tracking-[0.3em] uppercase text-gold-deep mb-3">Why Partner With Us</div>
+            <div className="text-xs tracking-[0.3em] uppercase text-gold-deep mb-3">Why Wholesale With Us</div>
             <h2 className="font-serif text-4xl md:text-5xl">
               Everything you need to{" "}
               <span className="italic text-gold-gradient">sell more gold</span>
@@ -227,7 +242,7 @@ export default function WholesalePage() {
           >
             <div className="text-xs tracking-[0.3em] uppercase text-gold mb-3">How It Works</div>
             <h2 className="font-serif text-4xl md:text-5xl text-white">
-              Partner in <span className="italic text-gold-gradient">5 simple steps</span>
+              Order in <span className="italic text-gold-gradient">5 simple steps</span>
             </h2>
           </motion.div>
 
@@ -276,8 +291,8 @@ export default function WholesalePage() {
 
             <div className="space-y-5">
               {[
-                { icon: Phone, label: "+91 99748 78332" },
-                { icon: Mail, label: "wholesale@swastikgold.in" },
+                { icon: Phone, label: CONTACT_INFO.phone },
+                { icon: Mail, label: CONTACT_INFO.email },
                 { icon: MapPin, label: "7-8-9 Ground Floor, Satkar Complex, CG Road, Ahmedabad" },
                 { icon: Building2, label: "GST: 24AABCS1429E1ZR" },
               ].map((item) => (
@@ -329,7 +344,7 @@ export default function WholesalePage() {
                     onSubmit={handleSubmit}
                     className="space-y-5"
                   >
-                    <h3 className="font-serif text-2xl mb-2">Partnership Enquiry Form</h3>
+                    <h3 className="font-serif text-2xl mb-2">Wholesale Enquiry Form</h3>
 
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>

@@ -2,6 +2,7 @@
 import { Instagram, Facebook, Mail, Phone } from "lucide-react";
 import Link from "next/link";
 import logo from "@/assets/swastik-gold-logo-new.png";
+import { CONTACT_INFO } from "@/config/contact";
 
 const cols = [
   {
@@ -9,7 +10,7 @@ const cols = [
       { label: "Home", to: "/" },
       { label: "Shop", to: "/shop" },
       { label: "Collection", to: "/collection" },
-      { label: "Create Your Own", to: "/#custom" },
+      { label: "Showroom", to: "/showroom" },
       { label: "Contact Us", to: "/#contact" },
     ]
   },
@@ -33,6 +34,13 @@ const cols = [
   },
 ];
 
+const SOCIALS = [
+  { icon: Instagram, href: CONTACT_INFO.instagram },
+  { icon: Facebook, href: CONTACT_INFO.facebook },
+  { icon: Mail, href: `mailto:${CONTACT_INFO.email}` },
+  { icon: Phone, href: `tel:${CONTACT_INFO.phoneRaw}` },
+];
+
 export const Footer = () => (
   <footer className="relative bg-brand-dark text-primary-foreground border-t-2 border-gold/40">
     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(165_50%_18%/0.6),transparent_70%)] pointer-events-none" />
@@ -47,16 +55,18 @@ export const Footer = () => (
             />
           </Link>
           <p className="text-primary-foreground/75 leading-relaxed max-w-sm">
-            India's trusted wholesale partner for hallmarked gold jewellery. Crafting timeless pieces for the country's finest retail boutiques since 1998.
+            India's trusted wholesaler for hallmarked gold jewellery. Crafting timeless pieces for the country's finest retail boutiques since 1998.
           </p>
           <div className="mt-6 flex items-center gap-3">
-            {[Instagram, Facebook, Mail, Phone].map((Icon, i) => (
+            {SOCIALS.map((soc, i) => (
               <a
                 key={i}
-                href="#"
+                href={soc.href}
+                target="_blank"
+                rel="noreferrer"
                 className="w-10 h-10 rounded-full border border-gold/40 flex items-center justify-center text-gold hover:bg-gradient-gold hover:text-gold-foreground hover:border-transparent transition-all duration-500 hover:-translate-y-0.5"
               >
-                <Icon className="w-4 h-4" strokeWidth={1.5} />
+                <soc.icon className="w-4 h-4" strokeWidth={1.5} />
               </a>
             ))}
           </div>
@@ -90,4 +100,3 @@ export const Footer = () => (
     </div>
   </footer>
 );
-

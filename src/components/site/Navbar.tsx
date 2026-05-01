@@ -9,11 +9,11 @@ import { createClient } from "@/lib/supabase/client";
 
 const links = [
   { label: "Home", to: "/" },
-  { label: "Catalogue", to: "/collection" },
-  { label: "Shop", to: "/shop", hasMega: true },
+  { label: "Our Showroom", to: "/showroom" },
+  { label: "Collections", to: "/collection" },
+  { label: "Shop Online", to: "/shop", hasMega: true },
   { label: "Wholesale", to: "/wholesale" },
-  { label: "Custom Design", to: "/custom-design" },
-  { label: "Showroom", to: "/showroom" },
+  { label: "Make Your Own", to: "/custom-design" },
   { label: "Contact", to: "/#contact" },
 ];
 
@@ -133,10 +133,10 @@ export const Navbar = () => {
 
   return (
     <motion.header
-      initial={{ y: -40, opacity: 0 }}
+      initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 bg-brand-dark shadow-soft ${scrolled || pathname !== "/" ? "py-2" : "py-3"
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 bg-brand-dark shadow-soft ${scrolled || pathname !== "/" ? "py-1.5" : "py-3"
         }`}
       onMouseLeave={() => setShowMega(false)}
     >
@@ -145,7 +145,7 @@ export const Navbar = () => {
           <img
             src={typeof logo === "string" ? logo : (logo as any).src}
             alt="Swastik Gold logo"
-            className={`transition-all duration-500 w-auto group-hover:scale-110 brightness-[1.02] contrast-[1.1] object-contain ${scrolled ? "h-14 md:h-16 -my-2" : "h-20 md:h-24 -my-4"
+            className={`transition-all duration-300 w-auto group-hover:scale-105 brightness-[1.02] contrast-[1.1] object-contain ${scrolled ? "h-12 md:h-14 -my-1" : "h-20 md:h-24 -my-4"
               }`}
           />
         </Link>
@@ -158,11 +158,11 @@ export const Navbar = () => {
             >
               <Link
                 href={l.to}
-                className={`relative text-[13px] font-medium tracking-wider transition-colors duration-300 flex items-center gap-1.5 py-4 after:absolute after:left-0 after:bottom-2 after:h-px after:bg-gradient-gold after:transition-all after:duration-500 hover:after:w-full ${isActive(l.to) ? "text-gold after:w-full" : "text-primary-foreground/85 hover:text-gold after:w-0"
+                className={`relative text-[13px] font-medium tracking-wider transition-colors duration-200 flex items-center gap-1.5 py-4 after:absolute after:left-0 after:bottom-2 after:h-px after:bg-gradient-gold after:transition-all after:duration-300 hover:after:w-full ${isActive(l.to) ? "text-gold after:w-full" : "text-primary-foreground/85 hover:text-gold after:w-0"
                   }`}
               >
                 {l.label}
-                {l.hasMega && <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${showMega ? "rotate-180" : ""}`} />}
+                {l.hasMega && <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${showMega ? "rotate-180" : ""}`} />}
               </Link>
             </li>
           ))}
@@ -186,38 +186,45 @@ export const Navbar = () => {
               <span>Login</span>
             </Link>
           )}
-          <Link
-            href="/#contact"
-            className="inline-flex items-center px-6 py-2.5 rounded-full bg-gradient-gold text-gold-foreground text-sm tracking-wide shadow-gold hover:-translate-y-0.5 transition-all duration-500"
-          >
-            Get a Quote
-          </Link>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Link
+              href="/#contact"
+              className="inline-flex items-center px-6 py-2.5 rounded-full bg-gradient-gold text-gold-foreground text-sm tracking-wide shadow-gold transition-all"
+            >
+              Get a Quote
+            </Link>
+          </motion.div>
         </div>
 
-        <button aria-label="Toggle menu" className="lg:hidden p-2 text-gold" onClick={() => setOpen((v) => !v)}>
-          {open ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <motion.button 
+          whileTap={{ scale: 0.9 }}
+          aria-label="Toggle menu" 
+          className="lg:hidden p-2 text-gold transition-colors hover:bg-gold/10 rounded-full" 
+          onClick={() => setOpen((v) => !v)}
+        >
+          {open ? <X size={24} /> : <Menu size={24} />}
+        </motion.button>
       </nav>
 
       {/* Mega Menu Overlay */}
       <AnimatePresence>
         {showMega && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="absolute top-full inset-x-0 bg-brand-dark border-t border-gold/20 shadow-2xl py-12 hidden xl:block"
+            exit={{ opacity: 0, y: -5 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-full inset-x-0 bg-brand-dark border-t border-gold/20 shadow-2xl py-10 hidden xl:block"
             onMouseEnter={() => setShowMega(true)}
           >
             <div className="container-luxe grid grid-cols-6 gap-8">
               {megaMenuData.map((col) => (
                 <div key={col.title}>
-                  <div className="flex items-center gap-2 text-gold mb-6 group cursor-default">
+                  <div className="flex items-center gap-2 text-gold mb-5 group cursor-default">
                     <col.icon className="w-4 h-4" />
-                    <span className="text-xs uppercase tracking-[0.2em] font-bold">{col.title}</span>
+                    <span className="text-[11px] uppercase tracking-[0.2em] font-bold">{col.title}</span>
                   </div>
-                  <ul className="space-y-3">
+                  <ul className="space-y-2.5">
                     {col.items.map((item) => (
                       <li key={item.label}>
                         <Link
@@ -240,39 +247,41 @@ export const Navbar = () => {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.4 }}
-            className="lg:hidden bg-brand-dark border-t border-gold/20 mt-2 max-h-[80vh] overflow-y-auto"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25 }}
+            className="lg:hidden bg-brand-dark border-t border-gold/20 mt-1 max-h-[85vh] overflow-y-auto"
           >
-            <ul className="container-luxe py-6 flex flex-col gap-4">
+            <ul className="container-luxe py-8 flex flex-col gap-5">
               {links.map((l) => (
                 <li key={l.label}>
                   <Link
                     href={l.to}
                     onClick={() => setOpen(false)}
-                    className="block py-2 text-base text-primary-foreground/85 hover:text-gold transition-colors"
+                    className="block py-2 text-lg text-primary-foreground/85 hover:text-gold transition-colors border-b border-white/5"
                   >
                     {l.label}
                   </Link>
                 </li>
               ))}
-              <Link
-                href="/#contact"
-                onClick={() => setOpen(false)}
-                className="mt-2 inline-flex justify-center px-6 py-3 rounded-full bg-gradient-gold text-gold-foreground text-sm"
-              >
-                Get a Quote
-              </Link>
-              <Link
-                href={user ? "/profile" : "/login"}
-                onClick={() => setOpen(false)}
-                className="mt-2 flex items-center justify-center gap-2 py-3 border border-gold/30 rounded-full text-gold text-sm"
-              >
-                <User size={16} />
-                {user ? "My Profile" : "Login / Register"}
-              </Link>
+              <motion.div whileTap={{ scale: 0.97 }} className="mt-4 flex flex-col gap-4">
+                <Link
+                  href="/#contact"
+                  onClick={() => setOpen(false)}
+                  className="flex justify-center px-6 py-4 rounded-xl bg-gradient-gold text-gold-foreground font-bold text-base"
+                >
+                  Get a Quote
+                </Link>
+                <Link
+                  href={user ? "/profile" : "/login"}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-center gap-2 py-4 border border-gold/30 rounded-xl text-gold text-base"
+                >
+                  <User size={18} />
+                  {user ? "My Profile" : "Login / Register"}
+                </Link>
+              </motion.div>
             </ul>
           </motion.div>
         )}

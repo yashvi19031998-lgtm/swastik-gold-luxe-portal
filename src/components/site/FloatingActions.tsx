@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp, MessageCircle } from "lucide-react";
 
+import { CONTACT_INFO } from "@/config/contact";
+
 export const FloatingActions = () => {
   const [show, setShow] = useState(false);
   useEffect(() => {
@@ -15,7 +17,7 @@ export const FloatingActions = () => {
   return (
     <>
       <motion.a
-        href="https://wa.me/919876543210"
+        href={`https://wa.me/${CONTACT_INFO.whatsapp}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"

@@ -4,11 +4,12 @@ import { motion } from "framer-motion";
 import { ShieldCheck, BadgeIndianRupee, Truck, Award, Sparkles } from "lucide-react";
 
 const items = [
-  { icon: ShieldCheck, title: "100% Hallmarked Gold", desc: "BIS-certified purity in every piece — 22K, 18K & 14K." },
-  { icon: BadgeIndianRupee, title: "Best Wholesale Rates", desc: "Direct from manufacturer pricing for serious trade partners." },
-  { icon: Truck, title: "Pan India Delivery", desc: "Insured, secure logistics to every corner of India." },
-  { icon: Award, title: "Trusted Since Years", desc: "Two decades of partnership with India's finest jewellers." },
-  { icon: Sparkles, title: "Custom Orders", desc: "Bespoke designs crafted to your retail customer's vision." },
+  { icon: ShieldCheck, title: "BIS Hallmarked Gold", desc: "We only sell BIS Hallmarked gold, ensuring 100% purity and complete trust for your business." },
+  { icon: BadgeIndianRupee, title: "Wholesale Price", desc: "Buy directly from us at factory prices to save more and earn better profits for your shop." },
+  { icon: Truck, title: "Fast & Safe Delivery", desc: "We deliver your jewellery safely all over India with full insurance and secure packaging." },
+  { icon: Award, title: "5+ Years of Trust", desc: "Serving jewellery showrooms with a focus on honesty, quality, and long-term relationship." },
+  { icon: Sparkles, title: "Make Custom Jewellery", desc: "We can make any gold jewellery design exactly as you want, tailored to your customers' needs." },
+  { icon: ShieldCheck, title: "Best Quality & Great Support", desc: "We provide high-quality product photos and marketing support to grow your jewellery business faster." },
 ];
 
 export const WhyChooseUs = () => (

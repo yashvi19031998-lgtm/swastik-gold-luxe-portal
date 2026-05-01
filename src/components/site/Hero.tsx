@@ -6,9 +6,9 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 
 /* ── Import local assets ── */
-import heroImage    from "@/assets/hero-jewellery.jpg";
+import heroImage from "@/assets/hero-jewellery.jpg";
 import weddingImage from "@/assets/coll-wedding.jpg";
-import necklaceImg  from "@/assets/collection-necklaces.jpg";
+import necklaceImg from "@/assets/collection-necklaces.jpg";
 
 const getImg = (img: any): string =>
   typeof img === "string" ? img : (img as any).src;
@@ -39,7 +39,7 @@ const SLIDES = [
     img: weddingImage,
     overlay: "from-brand-dark/85 via-brand-dark/50 to-transparent",
     accent2: "bg-primary/20",
-    stat: { val: "500+", label: "Retail Partners" },
+    stat: { val: "500+", label: "Retail Clients" },
   },
   {
     id: 2,
@@ -48,7 +48,7 @@ const SLIDES = [
     accent: "Wholesale Prices",
     sub: "From bold necklaces to delicate pendants — shop our latest arrivals freshly hallmarked and ready for your inventory.",
     cta: { label: "Shop Now", href: "/shop" },
-    cta2: { label: "Wholesale Partner", href: "/wholesale" },
+    cta2: { label: "Wholesale Inquiry", href: "/#contact" },
     img: necklaceImg,
     overlay: "from-brand-dark/80 via-brand-dark/40 to-transparent",
     accent2: "bg-gold-deep/20",
@@ -59,9 +59,9 @@ const SLIDES = [
 const AUTOPLAY_MS = 5500;
 
 export const Hero = () => {
-  const [current, setCurrent]     = useState(0);
+  const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1); // 1=next, -1=prev
-  const [paused, setPaused]       = useState(false);
+  const [paused, setPaused] = useState(false);
 
   const goTo = useCallback(
     (idx: number, dir: number) => {
@@ -71,7 +71,7 @@ export const Hero = () => {
     []
   );
 
-  const next = useCallback(() => goTo((current + 1) % SLIDES.length, 1),  [current, goTo]);
+  const next = useCallback(() => goTo((current + 1) % SLIDES.length, 1), [current, goTo]);
   const prev = useCallback(() => goTo((current - 1 + SLIDES.length) % SLIDES.length, -1), [current, goTo]);
 
   /* Auto-play */
@@ -85,23 +85,21 @@ export const Hero = () => {
 
   /* Framer variants */
   const imgVariants = {
-    enter:  (dir: number) => ({ x: dir > 0 ? "4%" : "-4%", opacity: 0, scale: 1.08 }),
+    enter: (dir: number) => ({ x: dir > 0 ? "4%" : "-4%", opacity: 0, scale: 1.08 }),
     center: { x: "0%", opacity: 1, scale: 1.05 }, // Added subtle zoom-in scale 1.05
-    exit:   (dir: number) => ({ x: dir > 0 ? "-4%" : "4%", opacity: 0, scale: 1 }),
+    exit: (dir: number) => ({ x: dir > 0 ? "-4%" : "4%", opacity: 0, scale: 1 }),
   };
 
   const textVariants = {
-    enter:  { opacity: 0, y: 30 },
+    enter: { opacity: 0, y: 30 },
     center: { opacity: 1, y: 0 },
-    exit:   { opacity: 0, y: -20 },
+    exit: { opacity: 0, y: -20 },
   };
 
   return (
     <section
       id="home"
       className="relative min-h-screen flex items-center overflow-hidden bg-brand-dark"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
     >
       {/* ── Background image slider ── */}
       <AnimatePresence initial={false} custom={direction} mode="sync">
@@ -179,7 +177,7 @@ export const Hero = () => {
               </Link>
               <Link
                 href={slide.cta2.href}
-                className="inline-flex items-center px-8 py-4 rounded-full border border-white/30 text-white hover:bg-white/10 hover:border-white/60 transition-all duration-500 tracking-wide"
+                className="inline-flex items-center px-8 py-4 rounded-full border border-gold text-gold bg-gold/10 hover:bg-gold hover:text-brand-dark transition-all duration-500 tracking-wide font-medium shadow-soft hover:shadow-gold backdrop-blur-sm"
               >
                 {slide.cta2.label}
               </Link>
