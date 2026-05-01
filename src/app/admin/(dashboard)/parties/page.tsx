@@ -160,7 +160,7 @@ export default function PartiesPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Party Management</h1>
-          <p className="text-slate-500 text-sm">Manage your suppliers and business partners</p>
+          <p className="text-slate-500 text-sm">Manage your suppliers and business clients</p>
         </div>
         <button
           onClick={() => openModal()}
@@ -208,7 +208,7 @@ export default function PartiesPage() {
                   <td colSpan={4} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center gap-2">
                       <Building2 className="w-12 h-12 text-slate-200" />
-                      <p className="text-slate-400">No parties found. Add your first party partner!</p>
+                      <p className="text-slate-400">No parties found. Add your first business contact!</p>
                     </div>
                   </td>
                 </tr>
@@ -285,7 +285,7 @@ export default function PartiesPage() {
                 <div className="p-2 bg-gold-500 rounded-lg text-slate-950">
                   <Building2 className="w-5 h-5" />
                 </div>
-                {currentParty ? "Edit Party Partner" : "Add New Party Partner"}
+                {currentParty ? "Edit Party Details" : "Add New Party"}
               </h2>
               <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-600 rounded-lg transition-colors">
                 <X className="w-5 h-5" />
@@ -399,7 +399,7 @@ export default function PartiesPage() {
                   {submitting ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
-                    currentParty ? "Update Partner" : "Save Partner"
+                    currentParty ? "Update Party" : "Save Party"
                   )}
                 </button>
               </div>

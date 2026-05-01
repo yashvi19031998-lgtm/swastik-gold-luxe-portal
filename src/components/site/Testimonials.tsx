@@ -7,12 +7,12 @@ const reviews = [
   {
     name: "Rajesh Mehta",
     role: "Mehta Jewellers, Jaipur",
-    text: "Swastik Gold has been our trusted wholesale partner for over a decade. Their craftsmanship and consistency are unmatched in the trade.",
+    text: "Swastik Gold has been our trusted wholesaler for over a decade. Their craftsmanship and consistency are unmatched in the trade.",
   },
   {
     name: "Anita Sharma",
     role: "Shree Gold Boutique, Surat",
-    text: "The hallmarked purity and elegant designs make every collection a hit with our customers. Truly a partner who understands retail.",
+    text: "The hallmarked purity and elegant designs make every collection a hit with our customers. Truly a wholesaler who understands retail.",
   },
   {
     name: "Vikram Singh",

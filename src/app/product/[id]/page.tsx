@@ -313,7 +313,7 @@ const ProductDetail = () => {
                 </ul>
               </TabsContent>
               <TabsContent value="ship" className="mt-6 text-foreground/80 leading-relaxed">
-                <p>Insured pan-India shipping via certified logistics partners. Bulk orders ship in tamper-evident sealed cases with full GST invoice and hallmark certification.</p>
+                <p>Insured pan-India shipping via certified logistics. Bulk orders ship in tamper-evident sealed cases with full GST invoice and hallmark certification.</p>
               </TabsContent>
             </Tabs>
           </div>

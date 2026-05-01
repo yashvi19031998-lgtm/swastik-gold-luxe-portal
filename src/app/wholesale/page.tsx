@@ -22,6 +22,7 @@ import {
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { FloatingActions } from "@/components/site/FloatingActions";
+import { CONTACT_INFO } from "@/config/contact";
 
 /* ─── Static Data ────────────────────────────────────────────── */
 const benefits = [
@@ -293,7 +294,7 @@ export default function WholesalePage() {
               {[
                 { icon: Phone, label: CONTACT_INFO.phone },
                 { icon: Mail, label: CONTACT_INFO.email },
-                { icon: MapPin, label: "7-8-9 Ground Floor, Satkar Complex, CG Road, Ahmedabad" },
+                { icon: MapPin, label: CONTACT_INFO.address },
                 { icon: Building2, label: "GST: 24AABCS1429E1ZR" },
               ].map((item) => (
                 <div key={item.label} className="flex items-start gap-4">

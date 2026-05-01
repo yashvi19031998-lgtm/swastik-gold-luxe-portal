@@ -9,6 +9,7 @@ import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
 import { BannerSection } from "@/components/site/BannerSection";
 import { FloatingActions } from "@/components/site/FloatingActions";
+import { CONTACT_INFO } from "@/config/contact";
 
 export const metadata: Metadata = {
   title: "Swastik Gold — Trusted Wholesale Gold Jewellery in India",
@@ -24,8 +25,8 @@ const Index = () => {
     "@type": "JewelryStore",
     name: "Swastik Gold",
     description: "Wholesale hallmarked gold jewellery manufacturer in India.",
-    address: { "@type": "PostalAddress", addressLocality: "Jaipur", addressRegion: "Rajasthan", addressCountry: "IN" },
-    telephone: "+91 98765 43210",
+    address: { "@type": "PostalAddress", addressLocality: "Ahmedabad", addressRegion: "Gujarat", addressCountry: "IN" },
+    telephone: CONTACT_INFO.phone,
   };
 
   return (
