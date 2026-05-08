@@ -12,7 +12,9 @@ import {
   Phone,
   Mail,
   MapPin,
-  Building2
+  Building2,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -31,7 +33,10 @@ interface Party {
 
 export default function PartiesPage() {
   const [parties, setParties] = useState<Party[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 15;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentParty, setCurrentParty] = useState<Party | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -52,23 +57,43 @@ export default function PartiesPage() {
 
   const fetchParties = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const from = (page - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+
+    let query = supabase
       .from("parties")
-      .select("*")
-      .order("created_at", { ascending: false });
+      .select("*", { count: "exact" });
+
+    if (searchQuery) {
+      query = query.or(`name.ilike.%${searchQuery}%,contact_person.ilike.%${searchQuery}%,city.ilike.%${searchQuery}%`);
+    }
+
+    const { data, error, count } = await query
+      .order("created_at", { ascending: false })
+      .range(from, to);
 
     if (error) {
       console.error("Error fetching parties:", error);
-      toast.error("Failed to fetch parties. Make sure the 'parties' table exists in Supabase.");
+      toast.error("Failed to fetch parties.");
     } else {
       setParties(data || []);
+      setTotalCount(count || 0);
     }
     setLoading(false);
   };
 
   useEffect(() => {
     fetchParties();
-  }, []);
+  }, [page]);
+
+  // Debounced search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (page !== 1) setPage(1);
+      else fetchParties();
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -203,7 +228,7 @@ export default function PartiesPage() {
                     <p className="text-slate-400 text-sm mt-2">Loading parties...</p>
                   </td>
                 </tr>
-              ) : filteredParties.length === 0 ? (
+              ) : parties.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center gap-2">
@@ -213,7 +238,7 @@ export default function PartiesPage() {
                   </td>
                 </tr>
               ) : (
-                filteredParties.map((party) => (
+                parties.map((party) => (
                   <tr key={party.id} className="hover:bg-slate-50/50 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
@@ -273,6 +298,35 @@ export default function PartiesPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination footer */}
+        {!loading && totalCount > PAGE_SIZE && (
+          <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between text-sm">
+            <span className="text-slate-500">
+              Showing {(page - 1) * PAGE_SIZE + 1}–
+              {Math.min(page * PAGE_SIZE, totalCount)} of {totalCount}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="p-2 text-slate-500 hover:bg-slate-200 rounded-lg disabled:opacity-40 transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="font-medium text-slate-700">
+                {page} / {Math.ceil(totalCount / PAGE_SIZE)}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(Math.ceil(totalCount / PAGE_SIZE), p + 1))}
+                disabled={page === Math.ceil(totalCount / PAGE_SIZE)}
+                className="p-2 text-slate-500 hover:bg-slate-200 rounded-lg disabled:opacity-40 transition-colors"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Modal */}

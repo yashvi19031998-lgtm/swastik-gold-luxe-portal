@@ -26,6 +26,44 @@ function supabase() {
 // SALES CRUD
 // ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * Fetch sales with server-side pagination
+ */
+export async function getSalesPaginated(
+  page: number = 1,
+  limit: number = 15,
+  search?: string,
+  status?: string
+): Promise<{ data: Sale[]; count: number }> {
+  const db = supabase();
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  let query = db
+    .from("sales")
+    .select(`*, parties ( party_name )`, { count: "exact" });
+
+  // Filtering
+  if (status) {
+    query = query.eq("payment_status", status);
+  }
+  
+  if (search) {
+    // Search in invoice_no (using ilike for case-insensitive search)
+    query = query.ilike("invoice_no", `%${search}%`);
+  }
+
+  const { data, error, count } = await query
+    .order("invoice_date", { ascending: false })
+    .range(from, to);
+
+  if (error) throw new Error(error.message);
+  return { 
+    data: (data ?? []) as Sale[], 
+    count: count ?? 0 
+  };
+}
+
 export async function getSales(): Promise<Sale[]> {
   const db = supabase();
   const { data, error } = await db

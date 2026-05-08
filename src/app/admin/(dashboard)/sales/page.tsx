@@ -20,7 +20,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-import { getSales, deleteSale } from "@/services/salesService";
+import { getSales, getSalesPaginated, deleteSale } from "@/services/salesService";
 import type { Sale } from "@/types/sales";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -95,17 +95,31 @@ const PAGE_SIZE = 15;
 export default function SalesPage() {
   const router = useRouter();
   const [sales, setSales] = useState<Sale[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"" | "paid" | "partial" | "pending">("");
   const [page, setPage] = useState(1);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // Financial aggregates (for cards)
+  const [totals, setTotals] = useState({ revenue: 0, pending: 0, paidCount: 0 });
+
   const fetchSales = async () => {
     setLoading(true);
     try {
-      const data = await getSales();
+      const { data, count } = await getSalesPaginated(page, PAGE_SIZE, search, statusFilter);
       setSales(data);
+      setTotalCount(count);
+
+      // Fetch summary totals for the cards (only once or when filters change if needed)
+      // For simplicity, we can fetch all for the aggregate or use a separate summary API
+      const allSales = await getSales(); // Keep this for stats until we have a proper summary RPC
+      const revenue = allSales.reduce((s, r) => s + (r.final_amount || 0), 0);
+      const pending = allSales.reduce((s, r) => s + (r.pending_amount || 0), 0);
+      const paid = allSales.filter((s) => s.payment_status === "paid").length;
+      setTotals({ revenue, pending, paidCount: paid });
+
     } catch (err: any) {
       toast.error("Failed to load sales: " + err.message);
     } finally {
@@ -115,32 +129,24 @@ export default function SalesPage() {
 
   useEffect(() => {
     fetchSales();
-  }, []);
+  }, [page, statusFilter]);
 
-  // ── Filtered & searched data ────────────────────────────────────────────
-  const filtered = useMemo(() => {
-    return sales.filter((s) => {
-      const matchSearch =
-        !search ||
-        s.invoice_no?.toLowerCase().includes(search.toLowerCase()) ||
-        s.parties?.party_name?.toLowerCase().includes(search.toLowerCase());
-      const matchStatus = !statusFilter || s.payment_status === statusFilter;
-      return matchSearch && matchStatus;
-    });
-  }, [sales, search, statusFilter]);
+  // Handle search with a small delay (debounce)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (page !== 1) setPage(1);
+      else fetchSales();
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   // ── Pagination ─────────────────────────────────────────────────────────
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const paginated = sales; // Already paginated from server
 
-  useEffect(() => {
-    setPage(1); // reset page on filter/search change
-  }, [search, statusFilter]);
-
-  // ── Aggregates ─────────────────────────────────────────────────────────
-  const totalRevenue = sales.reduce((s, r) => s + (r.final_amount || 0), 0);
-  const totalPending = sales.reduce((s, r) => s + (r.pending_amount || 0), 0);
-  const paidCount = sales.filter((s) => s.payment_status === "paid").length;
+  const totalRevenue = totals.revenue;
+  const totalPending = totals.pending;
+  const paidCount = totals.paidCount;
 
   const fmt = (n: number) =>
     "₹" + n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
@@ -234,7 +240,7 @@ export default function SalesPage() {
           </div>
 
           <span className="ml-auto text-xs text-slate-400">
-            {filtered.length} record{filtered.length !== 1 ? "s" : ""}
+            {totalCount} record{totalCount !== 1 ? "s" : ""}
           </span>
         </div>
 
@@ -354,11 +360,11 @@ export default function SalesPage() {
         </div>
 
         {/* Pagination footer */}
-        {!loading && filtered.length > PAGE_SIZE && (
+        {!loading && totalCount > PAGE_SIZE && (
           <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between text-sm">
             <span className="text-slate-500">
               Showing {(page - 1) * PAGE_SIZE + 1}–
-              {Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
+              {Math.min(page * PAGE_SIZE, totalCount)} of {totalCount}
             </span>
             <div className="flex items-center gap-2">
               <button

@@ -42,8 +42,11 @@ interface Product {
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 12;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
   
@@ -70,23 +73,36 @@ export default function ProductsPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [prodRes, catRes] = await Promise.all([
-        supabase
-          .from("products")
-          .select(`
+      const from = (page - 1) * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+
+      let productQuery = supabase
+        .from("products")
+        .select(`
+          *,
+          categories (
             *,
-            categories (
-              *,
-              collections (
-                name
-              )
-            ),
-            product_images (
-              id,
-              image_url
+            collections (
+              name
             )
-          `)
-          .order("created_at", { ascending: false }),
+          ),
+          product_images (
+            id,
+            image_url
+          )
+        `, { count: "exact" });
+
+      if (search) {
+        productQuery = productQuery.ilike("name", `%${search}%`);
+      }
+      if (filterCategory) {
+        productQuery = productQuery.eq("category_id", filterCategory);
+      }
+
+      const [prodRes, catRes] = await Promise.all([
+        productQuery
+          .order("created_at", { ascending: false })
+          .range(from, to),
         supabase
           .from("categories")
           .select("*, collections(name)")
@@ -97,6 +113,7 @@ export default function ProductsPage() {
       if (catRes.error) throw catRes.error;
 
       setProducts(prodRes.data || []);
+      setTotalCount(prodRes.count || 0);
       setCategories(catRes.data || []);
     } catch (error: any) {
       toast.error("Data fetch error: " + error.message);
@@ -107,7 +124,16 @@ export default function ProductsPage() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [page, filterCategory]);
+
+  // Debounced search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (page !== 1) setPage(1);
+      else fetchData();
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -355,12 +381,12 @@ export default function ProductsPage() {
                     <Loader2 className="w-8 h-8 animate-spin mx-auto text-gold-500" />
                   </td>
                 </tr>
-              ) : filteredProducts.length === 0 ? (
+              ) : products.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-slate-400">No products found.</td>
                 </tr>
               ) : (
-                filteredProducts.map((product) => (
+                products.map((product) => (
                   <tr key={product.id} className="hover:bg-slate-50 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -405,6 +431,35 @@ export default function ProductsPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination footer */}
+        {!loading && totalCount > PAGE_SIZE && (
+          <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between text-sm">
+            <span className="text-slate-500">
+              Showing {(page - 1) * PAGE_SIZE + 1}–
+              {Math.min(page * PAGE_SIZE, totalCount)} of {totalCount}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="p-2 text-slate-500 hover:bg-slate-200 rounded-lg disabled:opacity-40 transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="font-medium text-slate-700">
+                {page} / {Math.ceil(totalCount / PAGE_SIZE)}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(Math.ceil(totalCount / PAGE_SIZE), p + 1))}
+                disabled={page === Math.ceil(totalCount / PAGE_SIZE)}
+                className="p-2 text-slate-500 hover:bg-slate-200 rounded-lg disabled:opacity-40 transition-colors"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Product Modal */}
