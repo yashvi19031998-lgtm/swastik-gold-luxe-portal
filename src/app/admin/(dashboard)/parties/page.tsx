@@ -174,12 +174,6 @@ export default function PartiesPage() {
     setIsModalOpen(true);
   };
 
-  const filteredParties = parties.filter(party => 
-    party.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (party.contact_person && party.contact_person.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (party.city && party.city.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

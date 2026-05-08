@@ -314,12 +314,6 @@ export default function ProductsPage() {
     }
   };
 
-  const filteredProducts = products.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = filterCategory ? p.category_id === filterCategory : true;
-    return matchesSearch && matchesCategory;
-  });
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
