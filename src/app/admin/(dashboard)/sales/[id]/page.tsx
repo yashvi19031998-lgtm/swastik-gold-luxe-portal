@@ -176,21 +176,44 @@ export default function SaleDetailPage() {
               { label: "Subtotal (before GST)", val: fmt(sale.total_amount) },
               { label: "GST Amount", val: fmt(sale.gst_amount) },
               { label: "Grand Total", val: fmt(sale.final_amount), bold: true },
-              { label: "Paid Amount", val: fmt(sale.paid_amount), color: "text-emerald-600" },
-              {
-                label: "Pending Amount",
-                val: fmt(sale.pending_amount),
-                color: sale.pending_amount > 0 ? "text-red-600" : "text-slate-500",
-              },
-            ].map(({ label, val, bold, color }) => (
+            ].map(({ label, val, bold }) => (
               <div
                 key={label}
                 className={`flex justify-between text-sm ${bold ? "pt-2 border-t border-slate-200 font-bold text-slate-900" : ""}`}
               >
                 <span className={bold ? "text-slate-900" : "text-slate-500"}>{label}</span>
-                <span className={color ?? (bold ? "text-slate-900" : "text-slate-700")}>{val}</span>
+                <span className={bold ? "text-slate-900" : "text-slate-700"}>{val}</span>
               </div>
             ))}
+
+            {(sale.paid_amount > 0 || (sale.paid_gold ?? 0) > 0) && (
+              <div className="pt-2 border-t border-slate-100 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500 font-medium">Payment Breakdown:</span>
+                </div>
+                {sale.paid_amount > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400 ml-4">Cash Received</span>
+                    <span className="text-emerald-600 font-semibold">{fmt(sale.paid_amount)}</span>
+                  </div>
+                )}
+                {(sale.paid_gold ?? 0) > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400 ml-4">Gold Credit ({sale.paid_gold}g)</span>
+                    <span className="text-amber-600 font-semibold">
+                      {fmt((sale.paid_gold ?? 0) * (sale.gold_rate_on_payment ?? 0))}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="flex justify-between text-sm pt-2 border-t border-slate-200 font-bold">
+              <span className="text-slate-900">Remaining Outstanding</span>
+              <span className={sale.pending_amount > 0 ? "text-red-600" : "text-emerald-600"}>
+                {fmt(sale.pending_amount)}
+              </span>
+            </div>
           </div>
         </div>
       </div>

@@ -15,28 +15,32 @@ export default async function AdminDashboard() {
 
   const [
     { count: productCount },
-    { count: categoryCount },
-    { count: collectionCount },
-    { count: partyCount }
+    { data: salesData },
+    { data: partiesData }
   ] = await Promise.all([
     supabase.from("products").select("*", { count: "exact", head: true }),
-    supabase.from("categories").select("*", { count: "exact", head: true }),
-    supabase.from("collections").select("*", { count: "exact", head: true }),
-    supabase.from("parties").select("*", { count: "exact", head: true }),
+    supabase.from("sales").select("final_amount, pending_amount"),
+    supabase.from("parties").select("current_cash_balance, current_gold_balance"),
   ]);
+
+  const totalRevenue = (salesData || []).reduce((acc, s) => acc + (s.final_amount || 0), 0);
+  const totalOutstanding = (partiesData || []).reduce((acc, p) => acc + (p.current_cash_balance || 0), 0);
+  const totalGoldBalance = (partiesData || []).reduce((acc, p) => acc + (p.current_gold_balance || 0), 0);
 
   const stats = {
     products: productCount || 0,
-    categories: categoryCount || 0,
-    collections: collectionCount || 0,
-    parties: partyCount || 0,
+    revenue: totalRevenue,
+    outstanding: totalOutstanding,
+    goldBalance: totalGoldBalance,
   };
 
+  const fmt = (n: number) => "₹" + n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+
   const statCards = [
-    { name: "Total Products", value: stats.products, icon: Package, color: "bg-blue-500", trend: "+12%" },
-    { name: "Total Categories", value: stats.categories, icon: Tags, color: "bg-purple-500", trend: "+2%" },
-    { name: "Total Collections", value: stats.collections, icon: Layers, color: "bg-gold-500", trend: "+5%" },
-    { name: "Total Parties", value: stats.parties, icon: Building2, color: "bg-emerald-500", trend: "+8%" },
+    { name: "Total Revenue", value: fmt(stats.revenue), icon: TrendingUp, color: "bg-emerald-500", trend: "Total Sales" },
+    { name: "Total Outstanding", value: fmt(stats.outstanding), icon: ShoppingBag, color: "bg-red-500", trend: "Receivables" },
+    { name: "Gold Balance", value: `${stats.goldBalance.toFixed(3)} g`, icon: Layers, color: "bg-gold-500", trend: "Metal Account" },
+    { name: "Inventory Items", value: stats.products, icon: Package, color: "bg-blue-500", trend: "Active Stock" },
   ];
 
   return (

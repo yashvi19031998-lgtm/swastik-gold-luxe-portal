@@ -62,6 +62,8 @@ export interface Sale {
   gst_amount: number;
   final_amount: number;
   paid_amount: number;
+  paid_gold: number;
+  gold_rate_on_payment: number;
   pending_amount: number;
   payment_status: "paid" | "partial" | "pending";
   notes: string | null;
@@ -105,6 +107,8 @@ export interface SaleFormData {
   invoice_date: string;
   sales_by: string;
   paid_amount: number;
+  paid_gold: number;
+  gold_rate_on_payment: number;
   payment_status: "paid" | "partial" | "pending";
   notes: string;
   gst_percent: number; // e.g. 3 for 3%
@@ -118,6 +122,8 @@ export interface InvoiceSummary {
   total_amount: number;  // subtotal (before GST, matches DB `total_amount`)
   final_amount: number;  // total_amount + gst_amount
   paid_amount: number;
+  paid_gold: number;
+  gold_value: number;
   pending_amount: number;
   total_gold_weight: number; // total net_weight * qty
 }

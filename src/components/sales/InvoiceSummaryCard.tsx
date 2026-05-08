@@ -58,10 +58,26 @@ export function InvoiceSummaryCard({ summary, gstPercent }: InvoiceSummaryCardPr
         <Row label="Subtotal (before GST)" value={fmt(summary.total_amount)} />
         <Row label={`GST @ ${gstPercent}%`} value={fmt(summary.gst_amount)} />
         <Row label="Grand Total" value={fmt(summary.final_amount)} bold />
-        <Row label="Paid Amount" value={fmt(summary.paid_amount)} highlight="green" />
+        
+        {(summary.paid_amount > 0 || summary.gold_value > 0) && (
+          <div className="pt-2 mt-2 border-t border-slate-100 space-y-0.5">
+            {summary.paid_amount > 0 && (
+              <Row label="Cash Paid" value={fmt(summary.paid_amount)} highlight="green" />
+            )}
+            {summary.gold_value > 0 && (
+              <Row 
+                label={`Gold Credit (${summary.paid_gold}g)`} 
+                value={fmt(summary.gold_value)} 
+                highlight="gold" 
+              />
+            )}
+          </div>
+        )}
+
         <Row
-          label="Pending Amount"
+          label="Remaining Outstanding"
           value={fmt(summary.pending_amount)}
+          bold
           highlight={summary.pending_amount > 0 ? "red" : "green"}
         />
       </div>

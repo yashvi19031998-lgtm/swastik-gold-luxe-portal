@@ -36,6 +36,8 @@ const saleSchema = z.object({
   invoice_date: z.string().min(1, "Invoice date is required"),
   sales_by: z.string().min(1, "Sales person name is required"),
   paid_amount: z.number().min(0, "Paid amount cannot be negative"),
+  paid_gold: z.number().min(0, "Paid gold cannot be negative").default(0),
+  gold_rate_on_payment: z.number().min(0, "Gold rate cannot be negative").default(0),
   payment_status: z.enum(["paid", "partial", "pending"]),
   notes: z.string().optional(),
   gst_percent: z.number().min(0).max(28),
@@ -62,12 +64,18 @@ function calcItemTotal(item: Partial<SaleItemFormEntry>): number {
 function computeSummary(
   items: SaleItemFormEntry[],
   gstPercent: number,
-  paidAmount: number
+  paidAmount: number,
+  paidGold: number,
+  goldRate: number
 ): InvoiceSummary {
   const subtotal = items.reduce((sum, i) => sum + i.item_total, 0);
   const gst_amount = Number(((subtotal * gstPercent) / 100).toFixed(2));
   const final_amount = Number((subtotal + gst_amount).toFixed(2));
-  const pending_amount = Number((final_amount - paidAmount).toFixed(2));
+  
+  const gold_value = Number((paidGold * goldRate).toFixed(2));
+  const total_paid_value = paidAmount + gold_value;
+  const pending_amount = Number((final_amount - total_paid_value).toFixed(2));
+  
   const total_gold_weight = items.reduce((sum, i) => sum + i.net_weight * i.qty, 0);
 
   return {
@@ -76,15 +84,17 @@ function computeSummary(
     total_amount: subtotal,
     final_amount,
     paid_amount: paidAmount,
+    paid_gold: paidGold,
+    gold_value,
     pending_amount,
     total_gold_weight: Number(total_gold_weight.toFixed(3)),
   };
 }
 
-function derivePaymentStatus(paidAmount: number, finalAmount: number): "paid" | "partial" | "pending" {
+function derivePaymentStatus(paidValue: number, finalAmount: number): "paid" | "partial" | "pending" {
   if (finalAmount <= 0) return "pending";
-  if (paidAmount <= 0) return "pending";
-  if (paidAmount >= finalAmount) return "paid";
+  if (paidValue <= 0) return "pending";
+  if (paidValue >= finalAmount) return "paid";
   return "partial";
 }
 
@@ -120,6 +130,8 @@ export function SaleForm() {
       invoice_date: new Date().toISOString().slice(0, 10),
       sales_by: "",
       paid_amount: 0,
+      paid_gold: 0,
+      gold_rate_on_payment: 0,
       payment_status: "pending",
       notes: "",
       gst_percent: 3,
@@ -128,6 +140,8 @@ export function SaleForm() {
 
   const partyId = watch("party_id");
   const paidAmount = watch("paid_amount") ?? 0;
+  const paidGold = watch("paid_gold") ?? 0;
+  const goldRateOnPayment = watch("gold_rate_on_payment") ?? 0;
   const gstPercent = watch("gst_percent") ?? 3;
 
   // ── Load master data ─────────────────────────────────────────────────────
@@ -169,18 +183,25 @@ export function SaleForm() {
 
   // ── Recompute invoice summary ─────────────────────────────────────────────
   const invoiceSummary = useMemo(
-    () => computeSummary(items, gstPercent, Number(paidAmount) || 0),
-    [items, gstPercent, paidAmount]
+    () => computeSummary(
+      items, 
+      gstPercent, 
+      Number(paidAmount) || 0,
+      Number(paidGold) || 0,
+      Number(goldRateOnPayment) || 0
+    ),
+    [items, gstPercent, paidAmount, paidGold, goldRateOnPayment]
   );
 
   // Auto-update payment_status when paid changes
   useEffect(() => {
+    const totalPaidValue = (Number(paidAmount) || 0) + ((Number(paidGold) || 0) * (Number(goldRateOnPayment) || 0));
     const status = derivePaymentStatus(
-      Number(paidAmount) || 0,
+      totalPaidValue,
       invoiceSummary.final_amount
     );
     setValue("payment_status", status);
-  }, [paidAmount, invoiceSummary.final_amount, setValue]);
+  }, [paidAmount, paidGold, goldRateOnPayment, invoiceSummary.final_amount, setValue]);
 
   // ── Add product to line items ────────────────────────────────────────────
   const handleAddProduct = (product: ProductSummary | null) => {
@@ -246,6 +267,8 @@ export function SaleForm() {
         invoice_date: values.invoice_date,
         sales_by: values.sales_by,
         paid_amount: Number(values.paid_amount) || 0,
+        paid_gold: Number(values.paid_gold) || 0,
+        gold_rate_on_payment: Number(values.gold_rate_on_payment) || 0,
         payment_status: values.payment_status,
         notes: values.notes || "",
         gst_percent: values.gst_percent,
@@ -456,44 +479,100 @@ export function SaleForm() {
                 Payment Details
               </h2>
             </div>
-            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Paid Amount */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                  Paid Amount (₹)
-                </label>
-                <input
-                  type="number"
-                  min={0}
-                  step={0.01}
-                  {...register("paid_amount", { valueAsNumber: true })}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gold-500 bg-white"
-                  placeholder="0.00"
-                />
-                {errors.paid_amount && (
-                  <p className="text-xs text-red-500 mt-1">{errors.paid_amount.message}</p>
-                )}
-              </div>
-
-              {/* Payment Status – auto-set, read-only display */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                  Payment Status
-                  <span className="ml-2 text-[10px] text-slate-400 font-normal">(auto-computed)</span>
-                </label>
-                <div className="px-4 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium capitalize">
-                  {watch("payment_status") === "paid" && (
-                    <span className="text-emerald-600">✓ Paid</span>
-                  )}
-                  {watch("payment_status") === "partial" && (
-                    <span className="text-amber-600">◑ Partial</span>
-                  )}
-                  {watch("payment_status") === "pending" && (
-                    <span className="text-red-600">○ Pending</span>
+            <div className="p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Cash Payment */}
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    Cash Paid (₹)
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min={0}
+                      step={0.01}
+                      {...register("paid_amount", { valueAsNumber: true })}
+                      className="w-full pl-8 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gold-500 bg-white"
+                      placeholder="0.00"
+                    />
+                    <span className="absolute left-3 top-2.5 text-slate-400 text-sm">₹</span>
+                  </div>
+                  {errors.paid_amount && (
+                    <p className="text-xs text-red-500 mt-1">{errors.paid_amount.message}</p>
                   )}
                 </div>
-                {/* Hidden input so form value is submitted */}
-                <input type="hidden" {...register("payment_status")} />
+
+                {/* Payment Status – auto-set, read-only display */}
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    Payment Status
+                    <span className="ml-2 text-[10px] text-slate-400 font-normal">(auto-computed)</span>
+                  </label>
+                  <div className="px-4 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-sm font-medium capitalize">
+                    {watch("payment_status") === "paid" && (
+                      <span className="text-emerald-600">✓ Fully Paid</span>
+                    )}
+                    {watch("payment_status") === "partial" && (
+                      <span className="text-amber-600">◑ Partial Payment</span>
+                    )}
+                    {watch("payment_status") === "pending" && (
+                      <span className="text-red-600">○ Pending</span>
+                    )}
+                  </div>
+                  <input type="hidden" {...register("payment_status")} />
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-100">
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
+                  Gold Payment (Mixed)
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Gold Paid (grams) */}
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                      Gold Received (grams)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min={0}
+                        step={0.001}
+                        {...register("paid_gold", { valueAsNumber: true })}
+                        className="w-full pr-12 pl-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gold-500 bg-white"
+                        placeholder="0.000"
+                      />
+                      <span className="absolute right-3 top-2.5 text-slate-400 text-xs">grams</span>
+                    </div>
+                  </div>
+
+                  {/* Gold Rate for Payment */}
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                      Credit Rate (₹/gram)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min={0}
+                        step={1}
+                        {...register("gold_rate_on_payment", { valueAsNumber: true })}
+                        className="w-full pl-8 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gold-500 bg-white"
+                        placeholder="Rate for this gold"
+                      />
+                      <span className="absolute left-3 top-2.5 text-slate-400 text-sm">₹</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {paidGold > 0 && goldRateOnPayment > 0 && (
+                  <div className="mt-4 p-3 bg-gold-50 rounded-xl border border-gold-100 flex justify-between items-center">
+                    <span className="text-xs text-gold-700 font-medium">Equivalent Gold Credit Value:</span>
+                    <span className="text-sm font-bold text-gold-800">
+                      ₹{(paidGold * goldRateOnPayment).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

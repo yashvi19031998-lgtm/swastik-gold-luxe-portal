@@ -98,6 +98,8 @@ export async function createSale(
         gst_amount: invoiceSummary.gst_amount,
         final_amount: invoiceSummary.final_amount,
         paid_amount: formData.paid_amount,
+        paid_gold: formData.paid_gold || 0,
+        gold_rate_on_payment: formData.gold_rate_on_payment || 0,
         pending_amount: invoiceSummary.pending_amount,
         payment_status: formData.payment_status,
         notes: formData.notes || null,
@@ -126,7 +128,6 @@ export async function createSale(
 
   // ── 4. Reduce product stock ──────────────────────────────────────────────
   for (const item of formData.items) {
-    // Fetch current stock
     const { data: productData, error: stockFetchErr } = await db
       .from("products")
       .select("stock_qty")
@@ -145,19 +146,35 @@ export async function createSale(
     if (stockUpdateErr) throw new Error(stockUpdateErr.message);
   }
 
-  // ── 5. Get current party balance ─────────────────────────────────────────
+  // ── 5. Get current party balances ─────────────────────────────────────────
   const { data: partyData, error: partyFetchErr } = await db
     .from("parties")
-    .select("current_cash_balance")
+    .select("current_cash_balance, current_gold_balance")
     .eq("id", formData.party_id)
     .single();
 
   if (partyFetchErr) throw new Error(partyFetchErr.message);
 
-  const currentBalance = partyData.current_cash_balance ?? 0;
-  const newBalance = currentBalance - invoiceSummary.final_amount + formData.paid_amount;
+  const currentCashBalance = partyData.current_cash_balance ?? 0;
+  const currentGoldBalance = partyData.current_gold_balance ?? 0;
 
-  // ── 6. Insert party_ledger debit entry ────────────────────────────────────
+  // Calculate equivalent value of gold payment
+  const goldValue = (formData.paid_gold || 0) * (formData.gold_rate_on_payment || 0);
+  
+  // Total payment (Cash + Gold value)
+  const totalCreditValue = formData.paid_amount + goldValue;
+
+  /**
+   * Accounting Logic:
+   * 1. Sale increases what party owes (Debit Cash Balance)
+   * 2. Cash payment decreases what party owes (Credit Cash Balance)
+   * 3. Gold payment decreases what party owes (Credit Cash Balance by gold value)
+   * 4. Gold payment also tracked in Gold Balance (Credit Gold Balance)
+   */
+  const newCashBalance = currentCashBalance + invoiceSummary.final_amount - totalCreditValue;
+  const newGoldBalance = currentGoldBalance - (formData.paid_gold || 0);
+
+  // ── 6. Insert party_ledger entry ────────────────────────────────────
   const { error: ledgerError } = await db.from("party_ledger").insert([
     {
       party_id: formData.party_id,
@@ -165,21 +182,24 @@ export async function createSale(
       reference_id: saleId,
       reference_type: "sales",
       debit_amount: invoiceSummary.final_amount,
-      credit_amount: formData.paid_amount,
+      credit_amount: totalCreditValue,
       gold_debit: 0,
-      gold_credit: 0,
-      balance_amount: newBalance,
-      balance_gold: 0,
-      remarks: `Invoice ${invoiceNo}`,
+      gold_credit: formData.paid_gold || 0,
+      balance_amount: newCashBalance,
+      balance_gold: newGoldBalance,
+      remarks: `Invoice ${invoiceNo}${formData.paid_gold ? ` (Incl. ${formData.paid_gold}g Gold)` : ""}`,
     },
   ]);
 
   if (ledgerError) throw new Error(ledgerError.message);
 
-  // ── 7. Update party outstanding ───────────────────────────────────────────
+  // ── 7. Update party balances ───────────────────────────────────────────
   const { error: partyUpdateErr } = await db
     .from("parties")
-    .update({ current_cash_balance: newBalance })
+    .update({ 
+      current_cash_balance: newCashBalance,
+      current_gold_balance: newGoldBalance 
+    })
     .eq("id", formData.party_id);
 
   if (partyUpdateErr) throw new Error(partyUpdateErr.message);
