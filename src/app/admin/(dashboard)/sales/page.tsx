@@ -111,15 +111,6 @@ export default function SalesPage() {
       const { data, count } = await getSalesPaginated(page, PAGE_SIZE, search, statusFilter);
       setSales(data);
       setTotalCount(count);
-
-      // Fetch summary totals for the cards (only once or when filters change if needed)
-      // For simplicity, we can fetch all for the aggregate or use a separate summary API
-      const allSales = await getSales(); // Keep this for stats until we have a proper summary RPC
-      const revenue = allSales.reduce((s, r) => s + (r.final_amount || 0), 0);
-      const pending = allSales.reduce((s, r) => s + (r.pending_amount || 0), 0);
-      const paid = allSales.filter((s) => s.payment_status === "paid").length;
-      setTotals({ revenue, pending, paidCount: paid });
-
     } catch (err: any) {
       toast.error("Failed to load sales: " + err.message);
     } finally {
@@ -127,9 +118,25 @@ export default function SalesPage() {
     }
   };
 
+  const fetchSummary = async () => {
+    try {
+      const { getSalesSummary } = await import("@/services/salesService");
+      const summary = await getSalesSummary();
+      setTotals(summary);
+    } catch (err: any) {
+      console.error("Failed to fetch summary:", err);
+    }
+  };
+
+  // Fetch paginated data whenever page, search or filter changes
   useEffect(() => {
     fetchSales();
   }, [page, statusFilter]);
+
+  // Fetch summary ONLY once on mount
+  useEffect(() => {
+    fetchSummary();
+  }, []);
 
   // Handle search with a small delay (debounce)
   useEffect(() => {

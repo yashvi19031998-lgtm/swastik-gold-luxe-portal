@@ -80,6 +80,23 @@ export async function getSales(): Promise<Sale[]> {
   return (data ?? []) as Sale[];
 }
 
+export async function getSalesSummary(): Promise<{ revenue: number; pending: number; paidCount: number }> {
+  const db = supabase();
+  // Only select the bare minimum columns needed for the summary
+  const { data, error } = await db
+    .from("sales")
+    .select("final_amount, pending_amount, payment_status");
+
+  if (error) throw new Error(error.message);
+  
+  const sales = data ?? [];
+  return {
+    revenue: sales.reduce((s, r) => s + (r.final_amount || 0), 0),
+    pending: sales.reduce((s, r) => s + (r.pending_amount || 0), 0),
+    paidCount: sales.filter((s) => s.payment_status === "paid").length
+  };
+}
+
 export async function getSaleById(id: string): Promise<Sale> {
   const db = supabase();
   const { data, error } = await db
