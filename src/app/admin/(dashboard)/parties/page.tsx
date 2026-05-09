@@ -20,9 +20,9 @@ import { toast } from "sonner";
 
 interface Party {
   id: string;
-  name: string;
+  party_name: string;
   contact_person: string;
-  phone: string;
+  mobile_number: string;
   email: string;
   address: string;
   gst_number: string;
@@ -65,7 +65,7 @@ export default function PartiesPage() {
       .select("*", { count: "exact" });
 
     if (searchQuery) {
-      query = query.or(`name.ilike.%${searchQuery}%,contact_person.ilike.%${searchQuery}%,city.ilike.%${searchQuery}%`);
+      query = query.or(`party_name.ilike.%${searchQuery}%,contact_person.ilike.%${searchQuery}%,city.ilike.%${searchQuery}%`);
     }
 
     const { data, error, count } = await query
@@ -104,17 +104,33 @@ export default function PartiesPage() {
 
     setSubmitting(true);
     try {
+      const payload = {
+        party_name: formData.name,
+        contact_person: formData.contact_person,
+        mobile_number: formData.phone,
+        email: formData.email,
+        address: formData.address,
+        gst_number: formData.gst_number,
+        city: formData.city,
+        state: formData.state,
+      };
+
       if (currentParty) {
         const { error } = await supabase
           .from("parties")
-          .update(formData)
+          .update(payload)
           .eq("id", currentParty.id);
         if (error) throw error;
         toast.success("Party updated successfully");
       } else {
+        const insertPayload = {
+          ...payload,
+          unique_id: `PTY-${Date.now()}`,
+          company_id: 1
+        };
         const { error } = await supabase
           .from("parties")
-          .insert([formData]);
+          .insert([insertPayload]);
         if (error) throw error;
         toast.success("Party added successfully");
       }
@@ -159,9 +175,9 @@ export default function PartiesPage() {
     if (party) {
       setCurrentParty(party);
       setFormData({
-        name: party.name,
+        name: party.party_name || "",
         contact_person: party.contact_person || "",
-        phone: party.phone || "",
+        phone: party.mobile_number || "",
         email: party.email || "",
         address: party.address || "",
         gst_number: party.gst_number || "",
