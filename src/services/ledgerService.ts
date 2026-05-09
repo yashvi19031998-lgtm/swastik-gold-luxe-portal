@@ -11,12 +11,12 @@ function supabase() {
 }
 
 export type VoucherType = 
-  | "sale"           -- Sales Invoice
-  | "receipt"        -- Cash/Bank Receipt
-  | "metal_receipt"  -- Gold Deposit
-  | "metal_issue"    -- Gold given to Karigar/Party
-  | "journal"        -- Adjustments (e.g. converting gold to cash)
-  | "opening";       -- Opening Balances
+  | "sale"           // Sales Invoice
+  | "receipt"        // Cash/Bank Receipt
+  | "metal_receipt"  // Gold Deposit
+  | "metal_issue"    // Gold given to Karigar/Party
+  | "journal"        // Adjustments (e.g. converting gold to cash)
+  | "opening";       // Opening Balances
 
 export interface VoucherPayload {
   party_id: number;
