@@ -1,4 +1,4 @@
-// File: D:\Resume\swastik-gold-luxe-portal\src\app\layout.tsx
+// File: C:\xamp\htdocs\swastik-gold-luxe-portal\src\app\layout.tsx
 import * as entry from '../../../src/app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

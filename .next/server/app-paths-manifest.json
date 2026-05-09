@@ -1,7 +1,4 @@
 {
-  "/page": "app/page.js",
-  "/collection/page": "app/collection/page.js",
-  "/shop/page": "app/shop/page.js",
-  "/showroom/page": "app/showroom/page.js",
-  "/wholesale/page": "app/wholesale/page.js"
+  "/admin/(auth)/login/page": "app/admin/(auth)/login/page.js",
+  "/_not-found/page": "app/_not-found/page.js"
 }
