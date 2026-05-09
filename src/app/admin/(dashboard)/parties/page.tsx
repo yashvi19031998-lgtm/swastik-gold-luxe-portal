@@ -252,7 +252,7 @@ export default function PartiesPage() {
                   <tr key={party.id} className="hover:bg-slate-50/50 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
-                        <span className="font-bold text-slate-800">{party.name}</span>
+                        <span className="font-bold text-slate-800">{party.party_name}</span>
                         <span className="text-xs text-slate-500 flex items-center gap-1 mt-1">
                           <Building2 className="w-3 h-3" />
                           {party.contact_person || "No contact person"}
@@ -261,10 +261,10 @@ export default function PartiesPage() {
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <div className="space-y-1">
-                        {party.phone && (
+                        {party.mobile_number && (
                           <div className="flex items-center gap-2 text-slate-600">
                             <Phone className="w-3.5 h-3.5 text-slate-400" />
-                            {party.phone}
+                            {party.mobile_number}
                           </div>
                         )}
                         {party.email && (
